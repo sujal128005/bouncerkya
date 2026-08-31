@@ -1,0 +1,257 @@
+// Bouncer — persistence model.
+//
+// This mirrors /schemas (Zod) as closely as SQLite allows. Three storage-level
+// differences are unavoidable and are documented inline:
+//   1. SQLite has no enum type, so unions are TEXT with the legal values listed.
+//   2. SQLite has no scalar list type, so string arrays are stored as JSON TEXT.
+//   3. Child rows need a primary key and an explicit ordering column even
+//      though the domain objects are plain nested arrays.
+//
+// Money is INTEGER paise everywhere. There is no Float column for money.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../lib/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+  // Connection URL lives in prisma.config.ts (Prisma 7 no longer accepts
+  // `url` in the schema file).
+}
+
+model Principal {
+  id          String @id
+  displayName String
+
+  mandates       Mandate[]
+  stepUpRequests StepUpRequest[]
+}
+
+model Agent {
+  id           String @id
+  operatorName String
+  platform     String
+  publicKeyRef String
+
+  mandates         Mandate[]
+  purchaseRequests PurchaseRequest[]
+}
+
+model Mandate {
+  id          String @id
+  principalId String
+  agentId     String
+
+  /// JSON-encoded string[] — see note 2 above.
+  categoryScope String
+  spendCapMinor Int
+  /// Literal "INR" for this build.
+  currency      String   @default("INR")
+  expiresAt     DateTime
+  nonce         String   @unique
+  signature     String
+  createdAt     DateTime
+
+  principal        Principal         @relation(fields: [principalId], references: [id])
+  agent            Agent             @relation(fields: [agentId], references: [id])
+  purchaseRequests PurchaseRequest[]
+  consumedNonce    ConsumedNonce?
+
+  @@index([principalId])
+  @@index([agentId])
+}
+
+model PurchaseRequest {
+  id        String @id
+  mandateId String
+  agentId   String
+
+  totalMinor Int
+
+  /// sessionContext is flattened into three columns so it stays queryable.
+  /// JSON-encoded Record<string, unknown> — see note 2 above.
+  sessionStructuredFields String
+  sessionFreeText         String?
+  injectionMarkerDetected Boolean @default(false)
+
+  requestedAt DateTime
+
+  /// Set when the Intent-Cart Engine was invoked and did not return a usable
+  /// diff. Recorded rather than papered over: "timeout" | "malformed_output"
+  /// | "api_error". Prompt 4 decides what a failure means.
+  engineFailureReason  String?
+  engineFailureDetails String?
+
+  razorpayOrder     RazorpayOrder?
+
+  mandate           Mandate            @relation(fields: [mandateId], references: [id])
+  agent             Agent              @relation(fields: [agentId], references: [id])
+  items             CartItem[]
+  authorizationDiff AuthorizationDiff?
+  policyDecision    PolicyDecision?
+  auditEvents       AuditEvent[]
+  consumedNonce     ConsumedNonce?
+
+  @@index([mandateId])
+  @@index([agentId])
+}
+
+model CartItem {
+  /// Storage-only surrogate key; the domain CartItem has no id.
+  id                String @id
+  purchaseRequestId String
+  name              String
+  category          String
+  quantity          Int
+  unitPriceMinor    Int
+  sourceListingId   String
+  /// Storage-only: preserves cart line order.
+  position          Int
+
+  purchaseRequest PurchaseRequest @relation(fields: [purchaseRequestId], references: [id])
+
+  @@index([purchaseRequestId])
+}
+
+model AuthorizationDiff {
+  id String @id
+  /// Storage-only relational key back to the request being diffed.
+  purchaseRequestId String @unique
+
+  /// "consistent" | "drift_detected"
+  overallVerdictRecommendation String
+  confidence                   Float
+  summary                      String
+
+  /// Provenance. "live" = produced by the Intent-Cart Engine against a real
+  /// model call; "fixture" = a placeholder standing in for it. Kept out of the
+  /// Zod AuthorizationDiff on purpose: that schema is the model's output
+  /// contract, this is our record of where the output came from.
+  source          String    @default("fixture")
+  model           String?
+  engineLatencyMs Int?
+  computedAt      DateTime?
+
+  purchaseRequest PurchaseRequest @relation(fields: [purchaseRequestId], references: [id])
+  clauses         DiffClause[]
+  policyDecision  PolicyDecision?
+}
+
+model DiffClause {
+  /// Storage-only surrogate key; the domain DiffClause has no id.
+  id                  String @id
+  authorizationDiffId String
+
+  /// "category_drift" | "budget_overrun" | "quantity_anomaly"
+  /// | "injected_instruction" | "expiry" | "other"
+  type           String
+  /// "low" | "medium" | "high"
+  severity       String
+  mandateValue   String
+  attemptedValue String
+  explanation    String
+  /// Storage-only: preserves clause order.
+  position       Int
+
+  authorizationDiff AuthorizationDiff @relation(fields: [authorizationDiffId], references: [id])
+
+  @@index([authorizationDiffId])
+}
+
+model PolicyDecision {
+  id                String @id
+  purchaseRequestId String @unique
+
+  /// "ALLOW" | "STEP_UP" | "DECLINE"
+  outcome String
+  reason  String
+  /// Null for requests short-circuited by the Mandate Verifier: no diff was
+  /// produced because the Intent-Cart Engine was never reached.
+  authorizationDiffId String?  @unique
+  decidedAt           DateTime
+  latencyMs           Int
+
+  purchaseRequest   PurchaseRequest    @relation(fields: [purchaseRequestId], references: [id])
+  authorizationDiff AuthorizationDiff? @relation(fields: [authorizationDiffId], references: [id])
+  stepUpRequest     StepUpRequest?
+  auditEvents       AuditEvent[]
+  razorpayOrder     RazorpayOrder?
+}
+
+model StepUpRequest {
+  id               String @id
+  policyDecisionId String @unique
+  principalId      String
+
+  /// "pending" | "approved" | "rejected" | "expired"
+  status      String
+  respondedAt DateTime?
+
+  policyDecision PolicyDecision @relation(fields: [policyDecisionId], references: [id])
+  principal      Principal      @relation(fields: [principalId], references: [id])
+
+  @@index([principalId])
+}
+
+model AuditEvent {
+  id                String  @id
+  /// Chain position. Assigned inside the append transaction; the hash chain is
+  /// meaningless without a total order, and timestamps can collide.
+  sequence          Int     @unique
+  purchaseRequestId String
+  policyDecisionId  String
+  /// "policy_decision" | "step_up_response"
+  eventType         String
+  /// The canonical JSON that payloadHash is taken over. Stored because a chain
+  /// you cannot recompute is not verifiable, only decorative.
+  payload           String
+  payloadHash       String
+  previousEventHash String?
+  createdAt         DateTime
+
+  purchaseRequest PurchaseRequest @relation(fields: [purchaseRequestId], references: [id])
+  policyDecision  PolicyDecision  @relation(fields: [policyDecisionId], references: [id])
+
+  @@index([purchaseRequestId])
+  @@index([policyDecisionId])
+}
+
+/// Single-use mandate ledger. A nonce lands here the first time a purchase
+/// request presents it and passes verification; any later request presenting
+/// the same nonce is a replay. Persisted rather than derived, so "who spent
+/// this nonce, and when" is a fact on disk instead of a re-run of history.
+model ConsumedNonce {
+  nonce             String   @id
+  mandateId         String   @unique
+  purchaseRequestId String   @unique
+  consumedAt        DateTime
+
+  mandate         Mandate         @relation(fields: [mandateId], references: [id])
+  purchaseRequest PurchaseRequest @relation(fields: [purchaseRequestId], references: [id])
+}
+
+/// A Razorpay test-mode order, created only after an ALLOW decision.
+/// purchaseRequestId is unique: that uniqueness IS the idempotency guarantee,
+/// enforced by the database rather than by hoping a retry does not happen.
+model RazorpayOrder {
+  id                String   @id
+  purchaseRequestId String   @unique
+  policyDecisionId  String   @unique
+
+  razorpayOrderId String   @unique
+  receipt         String
+  amountMinor     Int
+  currency        String   @default("INR")
+  /// Razorpay order status: created | attempted | paid
+  status          String
+  createdAt       DateTime
+
+  /// Set by the webhook once a payment is captured or fails.
+  razorpayPaymentId String?
+  paymentStatus     String?
+  paymentUpdatedAt  DateTime?
+
+  purchaseRequest PurchaseRequest @relation(fields: [purchaseRequestId], references: [id])
+  policyDecision  PolicyDecision  @relation(fields: [policyDecisionId], references: [id])
+}
