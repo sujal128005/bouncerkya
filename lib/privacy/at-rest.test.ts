@@ -105,7 +105,12 @@ beforeAll(async () => {
   });
 });
 
-afterAll(() => {
+afterAll(async () => {
+  // Release the SQLite handle BEFORE deleting the file. POSIX lets you unlink
+  // an open file, so on Linux this passed while leaking a descriptor; Windows
+  // refuses with EPERM and fails the suite. The other two suites that use
+  // createTempDatabase already did this, and this one did not.
+  await prisma?.$disconnect();
   temp?.cleanup();
 });
 
