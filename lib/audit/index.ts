@@ -6,6 +6,7 @@ import type { AuditEventType } from "@/schemas";
 import {
   canonicalise,
   hashPayload,
+  reconcileRecords,
   verifyChain,
   type AuditPayload,
   type ChainVerification,
@@ -75,17 +76,50 @@ export async function appendAuditEvent(
   });
 }
 
-/** Verifies the whole stored chain. Pass events in to verify a set in memory. */
+/**
+ * Verifies the whole stored chain, in two independent parts.
+ *
+ *   1. The chain itself: no event edited, no link broken, no gap in sequence.
+ *   2. The rows those events describe: the stored PolicyDecision and
+ *      StepUpRequest still say what the audit event recorded.
+ *
+ * The second part exists because the first is not sufficient on its own. The
+ * audit events live in their own table; editing a PolicyDecision from DECLINE
+ * to ALLOW touches none of them, so a chain-only check reported "verified"
+ * over a database whose decisions had been rewritten. Turning a block into an
+ * approval after the fact is the exact thing this log is here to make
+ * impossible, so it has to be part of what verification means.
+ */
 export async function verifyAuditChain(): Promise<ChainVerification> {
-  const events = await prisma.auditEvent.findMany({
-    orderBy: { sequence: "asc" },
-    select: {
-      sequence: true,
-      payload: true,
-      payloadHash: true,
-      previousEventHash: true,
-    },
-  });
+  const [events, decisions, stepUps] = await Promise.all([
+    prisma.auditEvent.findMany({
+      orderBy: { sequence: "asc" },
+      select: {
+        sequence: true,
+        payload: true,
+        payloadHash: true,
+        previousEventHash: true,
+      },
+    }),
+    prisma.policyDecision.findMany({
+      select: {
+        id: true,
+        purchaseRequestId: true,
+        outcome: true,
+        reason: true,
+      },
+    }),
+    prisma.stepUpRequest.findMany({ select: { id: true, status: true } }),
+  ]);
 
-  return verifyChain(events);
+  const chain = verifyChain(events);
+  const drift = reconcileRecords(events, decisions, stepUps);
+
+  return {
+    valid: chain.valid && drift.length === 0,
+    eventsChecked: chain.eventsChecked,
+    violations: [...chain.violations, ...drift].sort(
+      (a, b) => a.sequence - b.sequence,
+    ),
+  };
 }

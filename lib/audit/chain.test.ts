@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   canonicalise,
   hashPayload,
+  reconcileRecords,
   verifyChain,
   type ChainEvent,
 } from "./chain";
@@ -135,5 +136,101 @@ describe("verifyChain", () => {
   it("verifies regardless of the order events are handed to it", () => {
     const chain = buildChain(PAYLOADS);
     expect(verifyChain([chain[2], chain[0], chain[1]]).valid).toBe(true);
+  });
+});
+
+/*
+ * A hash chain proves its own events were not edited. It proves nothing about
+ * the rows those events describe, and the rows are where the money decision
+ * actually lives. Before reconcileRecords existed, changing one PolicyDecision
+ * from DECLINE to ALLOW in the database left verifyChain reporting "verified",
+ * which is the one outcome an audit log exists to prevent.
+ */
+describe("reconciling the chain against the rows it describes", () => {
+  const DECISION_EVENT = {
+    event: "policy_decision",
+    policyDecisionId: "dec_1",
+    purchaseRequestId: "req_1",
+    outcome: "DECLINE",
+    reason: "Cart is outside the mandate.",
+  };
+  const STEP_UP_EVENT = {
+    event: "step_up_response",
+    stepUpRequestId: "stp_1",
+    policyDecisionId: "dec_1",
+    purchaseRequestId: "req_1",
+    status: "approved",
+  };
+
+  const events = buildChain([DECISION_EVENT, STEP_UP_EVENT]);
+  const DECISION = {
+    id: "dec_1",
+    purchaseRequestId: "req_1",
+    outcome: "DECLINE",
+    reason: "Cart is outside the mandate.",
+  };
+  const STEP_UP = { id: "stp_1", status: "approved" };
+
+  it("is silent when the rows still agree with the record", () => {
+    expect(reconcileRecords(events, [DECISION], [STEP_UP])).toEqual([]);
+  });
+
+  it("catches a DECLINE quietly turned into an ALLOW", () => {
+    const drift = reconcileRecords(
+      events,
+      [{ ...DECISION, outcome: "ALLOW" }],
+      [STEP_UP],
+    );
+    expect(drift).toHaveLength(1);
+    expect(drift[0].kind).toBe("record_drift");
+    expect(drift[0].detail).toContain("ALLOW");
+    expect(drift[0].detail).toContain("DECLINE");
+  });
+
+  it("catches a rewritten justification even when the outcome is untouched", () => {
+    const drift = reconcileRecords(
+      events,
+      [{ ...DECISION, reason: "Looks fine to me." }],
+      [STEP_UP],
+    );
+    expect(drift.map((d) => d.kind)).toEqual(["record_drift"]);
+  });
+
+  it("catches a human's answer being flipped after the fact", () => {
+    const drift = reconcileRecords(events, [DECISION], [
+      { id: "stp_1", status: "rejected" },
+    ]);
+    expect(drift).toHaveLength(1);
+    expect(drift[0].detail).toContain("StepUpRequest stp_1");
+  });
+
+  it("treats a deleted record as a violation, not as nothing to check", () => {
+    const drift = reconcileRecords(events, [], [STEP_UP]);
+    expect(drift).toHaveLength(1);
+    expect(drift[0].detail).toContain("no longer exists");
+  });
+
+  it("reports an unparseable payload rather than skipping it", () => {
+    const drift = reconcileRecords(
+      [{ sequence: 1, payload: "{not json" }],
+      [DECISION],
+      [STEP_UP],
+    );
+    expect(drift[0].kind).toBe("unreadable_payload");
+  });
+
+  it("ignores event types it does not know how to reconcile", () => {
+    const other = buildChain([{ event: "something_else", note: "x" }]);
+    expect(reconcileRecords(other, [DECISION], [STEP_UP])).toEqual([]);
+  });
+
+  it("does not fabricate drift for a field the event never recorded", () => {
+    const sparse = buildChain([
+      { event: "policy_decision", policyDecisionId: "dec_1", outcome: "DECLINE" },
+    ]);
+    // No `reason` in the payload, so a differing reason in the row is not drift.
+    expect(
+      reconcileRecords(sparse, [{ ...DECISION, reason: "anything" }], []),
+    ).toEqual([]);
   });
 });

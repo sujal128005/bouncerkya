@@ -282,8 +282,10 @@ export default async function RequestDetailPage({ params }: { params: Params }) 
             </div>
             <p className="mt-1.5 max-w-[84ch] text-body leading-[1.6] text-ink-2">
               Every step above is written to a SHA-256 hash chain over canonical
-              JSON. Editing any past record breaks every hash after it, which is
-              why the check below is recomputed on read rather than stored.
+              JSON. Editing a past event breaks every hash after it. Editing the
+              decision row instead touches no event at all, so verification also
+              compares each stored row against what its event recorded. Both
+              checks are recomputed on read rather than stored.
             </p>
             <div className="mt-4">
               <Panel>
@@ -302,8 +304,10 @@ export default async function RequestDetailPage({ params }: { params: Params }) 
                     {chain.eventsChecked === 1 ? "" : "s"} across every request in
                     this database,{" "}
                     {chain.valid
-                      ? "each one hashing to the value its successor records."
-                      : "with a break in the linkage. See the violations above."}
+                      ? "each one hashing to the value its successor records, and each stored decision still saying what its event recorded."
+                      : `with ${chain.violations.length} violation(s): ${chain.violations
+                          .map((violation) => violation.kind)
+                          .join(", ")}.`}
                   </p>
                 </PanelBody>
               </Panel>

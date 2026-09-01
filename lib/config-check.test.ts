@@ -129,3 +129,53 @@ describe("the encryption key", () => {
     expect(problems).toEqual([]);
   });
 });
+
+/*
+ * These cover a mistake that actually happened, not a hypothetical one. Two
+ * variables were written on one line of .env; dotenv gave the first a value
+ * containing the second's name and never defined the second; the seeder threw
+ * on "unknown preset" after deleting the old rows; and the console reported an
+ * empty database. Every message in that chain described a symptom.
+ */
+describe("two variables on one line", () => {
+  const MERGED = {
+    ...OK,
+    BOUNCER_ENGINE_PRESET: 'gemini" BOUNCER_ENGINE_API_KEY="AQ.Ab8RN6K',
+    BOUNCER_ENGINE_API_KEY: undefined,
+  };
+
+  it("is fatal, and names the variable that got swallowed", () => {
+    const problem = checkConfiguration(MERGED).find(
+      (p) => p.variable === "BOUNCER_ENGINE_PRESET" && p.detail.includes("one line"),
+    );
+    expect(problem?.severity).toBe("fatal");
+    expect(problem?.detail).toContain("BOUNCER_ENGINE_API_KEY");
+  });
+
+  it("is reported before the unknown-preset complaint it causes", () => {
+    const details = checkConfiguration(MERGED)
+      .filter((p) => p.variable === "BOUNCER_ENGINE_PRESET")
+      .map((p) => p.detail);
+    const merged = details.findIndex((d) => d.includes("one line"));
+    const unknown = details.findIndex((d) => d.includes("Unknown preset"));
+    expect(merged).toBeGreaterThanOrEqual(0);
+    expect(unknown).toBeGreaterThanOrEqual(0);
+    expect(merged).toBeLessThan(unknown);
+  });
+
+  it("never reports the value itself, only the name it swallowed", () => {
+    for (const problem of checkConfiguration(MERGED)) {
+      expect(problem.detail).not.toContain("AQ.Ab8RN6K");
+    }
+  });
+
+  it("does not fire on a legitimate value that merely contains an equals sign", () => {
+    // Base64 pads with "=", and a connection string can carry "?x=1".
+    const problems = checkConfiguration({
+      ...OK,
+      DATABASE_URL: "file:./prisma/dev.db?connection_limit=1",
+      BOUNCER_ENGINE_API_KEY: "gsk_abc==",
+    }).filter((p) => p.detail.includes("one line"));
+    expect(problems).toEqual([]);
+  });
+});

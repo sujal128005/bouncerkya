@@ -96,13 +96,42 @@ export function resolveEngineConfig(): EngineConfig | null {
   };
 }
 
-/** True when a usable model backend is configured. */
+/**
+ * True when a usable model backend is configured.
+ *
+ * WHY THIS SWALLOWS THE ERROR
+ *
+ * resolveEngineConfig() throws on an unknown preset, which is correct for a
+ * function whose job is to hand back a configuration: refusing to guess beats
+ * inventing a backend. But this is a PREDICATE. A predicate that throws makes
+ * every caller responsible for a failure mode they did not ask about, and not
+ * one of them did: an unknown preset used to abort `db:seed` between deleting
+ * the old rows and writing the new ones, leaving an empty database and a stack
+ * trace that named the preset rather than the typo that produced it.
+ *
+ * So the honest answer to "is a usable backend configured" when the preset is
+ * gibberish is no. That is also the safe answer, because no backend means the
+ * pipeline escalates to a human and never allows. The misconfiguration is not
+ * hidden: assertConfiguration() reports it by name at every entry point,
+ * before any of this runs.
+ */
 export function isEngineConfigured(): boolean {
-  return resolveEngineConfig() !== null;
+  try {
+    return resolveEngineConfig() !== null;
+  } catch {
+    return false;
+  }
 }
 
 export function describeEngine(): string {
-  const config = resolveEngineConfig();
+  let config: EngineConfig | null;
+  try {
+    config = resolveEngineConfig();
+  } catch (error) {
+    // Named, not swallowed. A console line reading "misconfigured" with the
+    // reason attached is worth more than a crash inside a summary printer.
+    return `misconfigured (${error instanceof Error ? error.message : String(error)})`;
+  }
   if (!config) return "not configured";
   return config.provider === "anthropic"
     ? `anthropic · ${config.model}`

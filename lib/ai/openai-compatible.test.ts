@@ -2,7 +2,11 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { EngineTransportError, type DiffModelRequest } from "./contract";
 import { createOpenAICompatibleDiffClient } from "./openai-compatible";
-import { resolveEngineConfig } from "./provider";
+import {
+  describeEngine,
+  isEngineConfigured,
+  resolveEngineConfig,
+} from "./provider";
 
 const REQUEST: DiffModelRequest = {
   model: "openai/gpt-oss-120b",
@@ -196,5 +200,45 @@ describe("provider selection", () => {
     vi.stubEnv("BOUNCER_ENGINE_PRESET", "notaprovider");
 
     expect(() => resolveEngineConfig()).toThrow(/Unknown BOUNCER_ENGINE_PRESET/);
+  });
+});
+
+/*
+ * resolveEngineConfig refuses to guess at an unknown preset, which is right.
+ * The predicates built on top of it must still answer the question they were
+ * asked. They did not, and `db:seed` called isEngineConfigured() one line
+ * after deleting every row, so a typo in .env produced an empty database.
+ */
+describe("a misconfigured preset does not propagate as an exception", () => {
+  const stubUnknownPreset = () => {
+    vi.stubEnv("ANTHROPIC_API_KEY", "");
+    vi.stubEnv("BOUNCER_ENGINE_API_KEY", "key");
+    vi.stubEnv("BOUNCER_ENGINE_BASE_URL", "");
+    vi.stubEnv("BOUNCER_ENGINE_MODEL", "");
+    vi.stubEnv("BOUNCER_ENGINE_PRESET", 'gemini" BOUNCER_ENGINE_API_KEY="AQ.x');
+  };
+
+  it("resolveEngineConfig still throws, because it must not invent a backend", () => {
+    stubUnknownPreset();
+    expect(() => resolveEngineConfig()).toThrow(/Unknown BOUNCER_ENGINE_PRESET/);
+  });
+
+  it("isEngineConfigured answers false instead of throwing", () => {
+    stubUnknownPreset();
+    expect(() => isEngineConfigured()).not.toThrow();
+    expect(isEngineConfigured()).toBe(false);
+  });
+
+  it("false is the fail-safe answer: no engine means escalate, never allow", () => {
+    stubUnknownPreset();
+    // Guarding the invariant itself, not just the return value: every caller
+    // treats "not configured" as a reason to step up to a human.
+    expect(isEngineConfigured()).toBe(false);
+  });
+
+  it("describeEngine reports the misconfiguration rather than crashing", () => {
+    stubUnknownPreset();
+    expect(describeEngine()).toMatch(/^misconfigured \(/);
+    expect(describeEngine()).toContain("Unknown BOUNCER_ENGINE_PRESET");
   });
 });

@@ -43,12 +43,28 @@ export function resolveAgentConfig():
   };
 }
 
+/**
+ * Same reasoning as isEngineConfigured in lib/ai/provider: a predicate must
+ * answer, not throw. This one is the first line of the POST handler behind the
+ * live-agent button, outside any try/catch, so an unknown preset used to turn
+ * the demo's most important control into an unhandled 500 instead of the
+ * "no model backend is configured" response the route was written to give.
+ */
 export function isAgentConfigured(): boolean {
-  return resolveAgentConfig() !== null;
+  try {
+    return resolveAgentConfig() !== null;
+  } catch {
+    return false;
+  }
 }
 
 export function describeAgent(): string {
-  const config = resolveAgentConfig();
+  let config: ReturnType<typeof resolveAgentConfig>;
+  try {
+    config = resolveAgentConfig();
+  } catch (error) {
+    return `misconfigured (${error instanceof Error ? error.message : String(error)})`;
+  }
   return config ? `${config.provider} · ${config.model}` : "not configured";
 }
 

@@ -32,6 +32,7 @@ import {
   type EngineResult,
 } from "../lib/ai";
 import { verifyAuditChain } from "../lib/audit";
+import { assertConfiguration } from "../lib/config-check";
 import {
   evaluatePurchaseRequest,
   recordEvaluation,
@@ -600,6 +601,17 @@ function engineRunner(
 /* -------------------------------------------------------------------- main */
 
 async function main(): Promise<void> {
+  /*
+   * FIRST, before touching the keystore or a single row.
+   *
+   * This function deletes every existing row before it writes new ones. A
+   * configuration error discovered after that point leaves an empty database
+   * and a console page that says "nothing has been seeded yet", which is a
+   * true statement about a symptom and says nothing about the cause. Checking
+   * here means a broken .env costs a message, not the data.
+   */
+  assertConfiguration();
+
   writeKeystore(keystore);
 
   const engineEnabled = isEngineConfigured();

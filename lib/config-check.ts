@@ -13,6 +13,8 @@
  *   - a Razorpay key that is not a test key, which would mean live money
  *   - a model preset that does not exist, which fails at the first call
  *   - a database URL that is empty
+ *   - two variables written on one line of .env, which silently swallows the
+ *     second one and gives the first a value nobody intended
  *
  * Values are never printed. A message says which variable is wrong and what
  * shape it should have, never what it currently contains.
@@ -29,6 +31,40 @@ const KNOWN_PRESETS = ["groq", "xai", "openrouter", "gemini"];
 /** AES-256. A key of any other length is a misconfiguration, not a weaker key. */
 const ENCRYPTION_KEY_BYTES = 32;
 
+/** Every variable this project reads, so one loop can sanity-check them all. */
+const OWN_VARIABLES = [
+  "DATABASE_URL",
+  "RAZORPAY_KEY_ID",
+  "RAZORPAY_KEY_SECRET",
+  "BOUNCER_ENGINE_PRESET",
+  "BOUNCER_ENGINE_API_KEY",
+  "BOUNCER_ENGINE_BASE_URL",
+  "BOUNCER_ENGINE_MODEL",
+  "BOUNCER_ENCRYPTION_KEY",
+  "ANTHROPIC_API_KEY",
+];
+
+/**
+ * Catches the single easiest mistake to make in a .env file: putting two
+ * assignments on one line.
+ *
+ *   BOUNCER_ENGINE_PRESET="gemini" BOUNCER_ENGINE_API_KEY="AQ..."
+ *
+ * dotenv does not complain. It gives the first variable a value containing the
+ * second variable's name, and never defines the second at all. Every downstream
+ * error then describes a symptom ("unknown preset") rather than the cause, and
+ * the person editing the file has no way to work back from one to the other.
+ *
+ * This looks for another of our own variable names followed by `=` inside a
+ * value, which cannot happen in a legitimate key, URL or base64 blob.
+ */
+function mergedLine(value: string): string | null {
+  for (const name of OWN_VARIABLES) {
+    if (new RegExp(`\\b${name}\\s*=`).test(value)) return name;
+  }
+  return null;
+}
+
 /** Pure so it is testable; reads a snapshot rather than `process.env` directly. */
 export function checkConfiguration(
   env: Record<string, string | undefined>,
@@ -38,6 +74,23 @@ export function checkConfiguration(
     const raw = env[name];
     return raw && raw.trim().length > 0 ? raw.trim() : undefined;
   };
+
+  /*
+   * Run this before anything else. A merged line makes some OTHER check fail
+   * with a message about the wrong variable, and chasing that message is how
+   * an evening disappears.
+   */
+  for (const name of OWN_VARIABLES) {
+    const raw = value(name);
+    const swallowed = raw ? mergedLine(raw) : null;
+    if (swallowed) {
+      problems.push({
+        variable: name,
+        severity: "fatal",
+        detail: `Its value contains "${swallowed}=", so two variables are on one line in .env. Each variable needs its own line, and ${swallowed} is currently not set at all.`,
+      });
+    }
+  }
 
   if (!value("DATABASE_URL")) {
     problems.push({
