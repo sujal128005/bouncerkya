@@ -141,7 +141,7 @@ export function describeScenario(input: LabelInput): ScenarioLabel {
       : "for this cart";
     return {
       title: "Engine could not judge",
-      subtitle: `No Authorization Diff was produced ${cart}. Bouncer escalates to a human rather than treating an absent answer as permission.`,
+      subtitle: `No Authorization Diff was produced ${cart}. STEALTH escalates to a human rather than treating an absent answer as permission.`,
       stoppedAt: "fail-safe",
     };
   }

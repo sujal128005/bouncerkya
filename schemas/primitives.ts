@@ -5,19 +5,19 @@ import { z } from "zod";
  * about identifiers, money and time are stated exactly once.
  */
 
-/** Opaque identifier. Bouncer never generates IDs from user input. */
+/** Opaque identifier. STEALTH never generates IDs from user input. */
 export const Id = z.string().min(1, "id must not be empty");
 
 /**
  * Money is ALWAYS an integer in minor units (paise for INR).
- * Floats are never used for money anywhere in Bouncer.
+ * Floats are never used for money anywhere in STEALTH.
  */
 export const MinorUnits = z
   .number()
   .int("amounts must be integers in minor units (paise)")
   .nonnegative("amounts must not be negative");
 
-/** Bouncer is INR-only for this build. */
+/** STEALTH is INR-only for this build. */
 export const Currency = z.literal("INR");
 
 /**

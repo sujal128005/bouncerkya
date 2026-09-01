@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { Confidence } from "./primitives";
 
-/** The kinds of mismatch Bouncer can report between mandate and cart. */
+/** The kinds of mismatch STEALTH can report between mandate and cart. */
 export const DiffClauseType = z.enum([
   "category_drift",
   "budget_overrun",

@@ -84,7 +84,7 @@ function main(): void {
   const selfTest = flags.includes("--self-test");
   const BUG_RATE = 0.01;
 
-  console.log(`Bouncer — credential path, ${count.toLocaleString()} cases, seed ${seed}`);
+  console.log(`STEALTH — credential path, ${count.toLocaleString()} cases, seed ${seed}`);
   console.log("No model is called on this path. Labels come from the generator's");
   console.log("intent, not from Bouncer's own rules.\n");
 

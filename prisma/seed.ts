@@ -76,13 +76,13 @@ const agents = [
     id: "agt_vega_01",
     operatorName: "Vega Shopping Copilot",
     platform: "vega-agent-runtime/1.4",
-    publicKeyRef: "kms://bouncer/agent-keys/vega-01",
+    publicKeyRef: "kms://stealth/agent-keys/vega-01",
   }),
   Agent.parse({
     id: "agt_pantry_02",
     operatorName: "Pantry Copilot",
     platform: "openagent-runtime/0.9",
-    publicKeyRef: "kms://bouncer/agent-keys/pantry-02",
+    publicKeyRef: "kms://stealth/agent-keys/pantry-02",
   }),
 ];
 
@@ -624,7 +624,7 @@ async function main(): Promise<void> {
       "No model backend configured. The Intent-Cart Engine will NOT be called.",
     );
     console.warn(
-      "  Set ANTHROPIC_API_KEY, or BOUNCER_ENGINE_PRESET + BOUNCER_ENGINE_API_KEY.",
+      "  Set ANTHROPIC_API_KEY, or STEALTH_ENGINE_PRESET + STEALTH_ENGINE_API_KEY.",
     );
     console.warn(
       "  a/b/c use labelled placeholder diffs; g/h exercise the STEP_UP fail-safe.",

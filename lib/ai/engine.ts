@@ -1,4 +1,5 @@
 import type { ExtractedEvidence } from "@/lib/extraction";
+import { setting } from "@/lib/env-vars";
 import { AuthorizationDiff } from "@/schemas";
 
 import {
@@ -34,7 +35,7 @@ export const DEFAULT_MODEL = "claude-sonnet-5";
  * 1500 comfortably fits the largest diff observed (4 clauses, ~800 tokens).
  */
 export const DEFAULT_MAX_TOKENS = Number(
-  process.env.BOUNCER_ENGINE_MAX_TOKENS ?? 1500,
+  setting("ENGINE_MAX_TOKENS") ?? 1500,
 );
 export const DEFAULT_TEMPERATURE = 0.1;
 

@@ -154,16 +154,16 @@ describe("openai-compatible adapter", () => {
 describe("provider selection", () => {
   it("is unconfigured when no key is present", () => {
     vi.stubEnv("ANTHROPIC_API_KEY", "");
-    vi.stubEnv("BOUNCER_ENGINE_API_KEY", "");
+    vi.stubEnv("STEALTH_ENGINE_API_KEY", "");
     expect(resolveEngineConfig()).toBeNull();
   });
 
   it("defaults to Anthropic when only ANTHROPIC_API_KEY is set", () => {
     vi.stubEnv("ANTHROPIC_API_KEY", "sk-ant-test");
-    vi.stubEnv("BOUNCER_ENGINE_API_KEY", "");
-    vi.stubEnv("BOUNCER_ENGINE_PRESET", "");
-    vi.stubEnv("BOUNCER_ENGINE_BASE_URL", "");
-    vi.stubEnv("BOUNCER_ENGINE_MODEL", "");
+    vi.stubEnv("STEALTH_ENGINE_API_KEY", "");
+    vi.stubEnv("STEALTH_ENGINE_PRESET", "");
+    vi.stubEnv("STEALTH_ENGINE_BASE_URL", "");
+    vi.stubEnv("STEALTH_ENGINE_MODEL", "");
 
     expect(resolveEngineConfig()).toEqual({
       provider: "anthropic",
@@ -175,9 +175,9 @@ describe("provider selection", () => {
 
   it("resolves the groq preset to its base url and default model", () => {
     vi.stubEnv("ANTHROPIC_API_KEY", "");
-    vi.stubEnv("BOUNCER_ENGINE_API_KEY", "gsk-test");
-    vi.stubEnv("BOUNCER_ENGINE_PRESET", "groq");
-    vi.stubEnv("BOUNCER_ENGINE_MODEL", "");
+    vi.stubEnv("STEALTH_ENGINE_API_KEY", "gsk-test");
+    vi.stubEnv("STEALTH_ENGINE_PRESET", "groq");
+    vi.stubEnv("STEALTH_ENGINE_MODEL", "");
 
     expect(resolveEngineConfig()).toEqual({
       provider: "openai-compatible",
@@ -188,18 +188,18 @@ describe("provider selection", () => {
   });
 
   it("lets BOUNCER_ENGINE_MODEL override a preset's default", () => {
-    vi.stubEnv("BOUNCER_ENGINE_API_KEY", "gsk-test");
-    vi.stubEnv("BOUNCER_ENGINE_PRESET", "groq");
-    vi.stubEnv("BOUNCER_ENGINE_MODEL", "llama-3.3-70b-versatile");
+    vi.stubEnv("STEALTH_ENGINE_API_KEY", "gsk-test");
+    vi.stubEnv("STEALTH_ENGINE_PRESET", "groq");
+    vi.stubEnv("STEALTH_ENGINE_MODEL", "llama-3.3-70b-versatile");
 
     expect(resolveEngineConfig()?.model).toBe("llama-3.3-70b-versatile");
   });
 
   it("rejects an unknown preset by name", () => {
-    vi.stubEnv("BOUNCER_ENGINE_API_KEY", "test");
-    vi.stubEnv("BOUNCER_ENGINE_PRESET", "notaprovider");
+    vi.stubEnv("STEALTH_ENGINE_API_KEY", "test");
+    vi.stubEnv("STEALTH_ENGINE_PRESET", "notaprovider");
 
-    expect(() => resolveEngineConfig()).toThrow(/Unknown BOUNCER_ENGINE_PRESET/);
+    expect(() => resolveEngineConfig()).toThrow(/Unknown STEALTH_ENGINE_PRESET/);
   });
 });
 
@@ -212,15 +212,15 @@ describe("provider selection", () => {
 describe("a misconfigured preset does not propagate as an exception", () => {
   const stubUnknownPreset = () => {
     vi.stubEnv("ANTHROPIC_API_KEY", "");
-    vi.stubEnv("BOUNCER_ENGINE_API_KEY", "key");
-    vi.stubEnv("BOUNCER_ENGINE_BASE_URL", "");
-    vi.stubEnv("BOUNCER_ENGINE_MODEL", "");
-    vi.stubEnv("BOUNCER_ENGINE_PRESET", 'gemini" BOUNCER_ENGINE_API_KEY="AQ.x');
+    vi.stubEnv("STEALTH_ENGINE_API_KEY", "key");
+    vi.stubEnv("STEALTH_ENGINE_BASE_URL", "");
+    vi.stubEnv("STEALTH_ENGINE_MODEL", "");
+    vi.stubEnv("STEALTH_ENGINE_PRESET", 'gemini" BOUNCER_ENGINE_API_KEY="AQ.x');
   };
 
   it("resolveEngineConfig still throws, because it must not invent a backend", () => {
     stubUnknownPreset();
-    expect(() => resolveEngineConfig()).toThrow(/Unknown BOUNCER_ENGINE_PRESET/);
+    expect(() => resolveEngineConfig()).toThrow(/Unknown STEALTH_ENGINE_PRESET/);
   });
 
   it("isEngineConfigured answers false instead of throwing", () => {
@@ -239,6 +239,6 @@ describe("a misconfigured preset does not propagate as an exception", () => {
   it("describeEngine reports the misconfiguration rather than crashing", () => {
     stubUnknownPreset();
     expect(describeEngine()).toMatch(/^misconfigured \(/);
-    expect(describeEngine()).toContain("Unknown BOUNCER_ENGINE_PRESET");
+    expect(describeEngine()).toContain("Unknown STEALTH_ENGINE_PRESET");
   });
 });

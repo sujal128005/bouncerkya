@@ -5,7 +5,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { createTempDatabase } from "@/lib/test-support/temp-database";
 
 import { ENCRYPTED_FIELDS, open, seal } from "./at-rest";
-import { generateEncryptionKey, isEncrypted } from "./crypto";
+import { ACCEPTED_VERSIONS, generateEncryptionKey, isEncrypted } from "./crypto";
 
 /**
  * The outcome test.
@@ -51,7 +51,7 @@ beforeAll(async () => {
       id: "agt_TEST01",
       operatorName: "Test Copilot",
       platform: "test/1.0",
-      publicKeyRef: "kms://bouncer/agent-keys/test-01",
+      publicKeyRef: "kms://stealth/agent-keys/test-01",
     },
   });
   await prisma.mandate.create({
@@ -125,13 +125,19 @@ describe("the database file", () => {
 
   it("contains ciphertext for every encrypted field", () => {
     const bytes = fs.readFileSync(temp.file).toString("binary");
-    // Four sealed columns on the rows written above.
-    expect(bytes.split("bnc1.").length - 1).toBeGreaterThanOrEqual(4);
+    // Four sealed columns on the rows written above. Counts every accepted
+    // scheme, so this keeps working across a version bump rather than silently
+    // passing on a file that contains no ciphertext at all.
+    const sealed = ACCEPTED_VERSIONS.reduce(
+      (total, version) => total + bytes.split(`${version}.`).length - 1,
+      0,
+    );
+    expect(sealed).toBeGreaterThanOrEqual(4);
   });
 
   it("still exposes the fields that are deliberately NOT encrypted", () => {
     // The honest half of the claim. A thief with this file learns that a
-    // purchase happened, for how much, in what category and what Bouncer
+    // purchase happened, for how much, in what category and what STEALTH
     // decided. /privacy says exactly this, so it had better be true.
     const bytes = fs.readFileSync(temp.file);
     for (const visible of ["footwear/running-shoes", "req_TEST01", "lst_88431"]) {

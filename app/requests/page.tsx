@@ -104,7 +104,7 @@ export default async function RequestsPage() {
         ))}
         <div className="flex items-baseline gap-2">
           <dt className="label-caps">Blocked pre-model</dt>
-          <dd className="font-mono text-lead font-semibold text-cyan tabular-nums">
+          <dd className="font-mono text-lead font-semibold text-measure tabular-nums">
             {blockedPreModel}
           </dd>
         </div>

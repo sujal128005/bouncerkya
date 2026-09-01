@@ -1,5 +1,5 @@
 /**
- * Generates an encryption key for BOUNCER_ENCRYPTION_KEY.
+ * Generates an encryption key for STEALTH_ENCRYPTION_KEY.
  *
  *   npm run privacy:keygen
  *

@@ -4,7 +4,7 @@
  * A small fixed catalog the demo agent can browse. Hardcoded rather than
  * DB-seeded on purpose: it is a fixture of the outside world, not state the
  * product owns, and keeping it out of the schema means no migration and no
- * confusion about whether Bouncer "knows" the merchant's catalogue.
+ * confusion about whether STEALTH "knows" the merchant's catalogue.
  *
  * Exactly one listing is poisoned. Its description carries an injected
  * instruction aimed at the shopping agent. See POISONED_LISTING_ID.

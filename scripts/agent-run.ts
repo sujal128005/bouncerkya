@@ -18,6 +18,7 @@
  * said about itself.
  */
 import "../lib/load-env";
+import { setting } from "../lib/env-vars";
 
 import {
   cartSummary,
@@ -49,7 +50,7 @@ const sleep = (ms: number) =>
  * guarantee a 429 on the next run's first turn. Configurable because a paid
  * tier does not need it.
  */
-const GAP_MS = Number(process.env.BOUNCER_AGENT_RUN_GAP_MS ?? 15_000);
+const GAP_MS = Number(setting("AGENT_RUN_GAP_MS") ?? 15_000);
 
 async function once(mode: Mode, submit: boolean, index: number, total: number) {
   const { client, model } = createAgentClient();

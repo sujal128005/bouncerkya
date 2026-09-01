@@ -21,7 +21,7 @@ export const SessionContext = z.object({
   injectionMarkerDetected: z.boolean(),
 });
 
-/** The checkout attempt presented to Bouncer. */
+/** The checkout attempt presented to STEALTH. */
 export const PurchaseRequest = z.object({
   id: Id,
   mandateId: Id,

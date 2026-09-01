@@ -30,9 +30,9 @@ import {
  */
 
 export const metadata = {
-  title: "Evidence · Bouncer",
+  title: "Evidence · STEALTH",
   description:
-    "The measured results behind Bouncer, each stating what it proves and what it does not.",
+    "The measured results behind STEALTH, each stating what it proves and what it does not.",
 };
 
 const STATUS_STYLE: Record<Verification["status"], string> = {
@@ -49,9 +49,9 @@ const STATUS_WORD: Record<Verification["status"], string> = {
 
 const CARD_TONES = [
   "border-t-accent",
-  "border-t-cyan",
-  "border-t-violet",
-  "border-t-fuchsia",
+  "border-t-measure",
+  "border-t-rail",
+  "border-t-evidence",
 ] as const;
 
 function ResultCard({ result, index }: { result: MeasuredResult; index: number }) {
@@ -61,7 +61,7 @@ function ResultCard({ result, index }: { result: MeasuredResult; index: number }
         title={result.title}
         meta={
           result.command ? (
-            <code className="rounded-control border border-cyan-line bg-cyan-soft px-2 py-[2px] font-mono text-label text-cyan">
+            <code className="rounded-control border border-measure-line bg-measure-soft px-2 py-[2px] font-mono text-label text-measure">
               {result.command}
             </code>
           ) : null
@@ -79,7 +79,7 @@ function ResultCard({ result, index }: { result: MeasuredResult; index: number }
               <dd
                 className={`mt-0.5 font-mono tabular-nums ${
                   figure.emphasis
-                    ? "text-head font-semibold text-cyan"
+                    ? "text-head font-semibold text-measure"
                     : "text-lead text-ink"
                 }`}
               >
@@ -117,7 +117,7 @@ export default function EvidencePage() {
     <main className="mx-auto flex max-w-[1100px] flex-col px-6 pt-8 pb-10">
       <div className="relative border-b border-line pb-6">
         <h1 className="font-display flex items-center gap-2.5 text-page font-bold text-ink">
-          <IconVerdict className="h-6 w-6 text-cyan" />
+          <IconVerdict className="h-6 w-6 text-measure" />
           Evidence
         </h1>
         <p className="mt-2 max-w-[76ch] text-body leading-[1.65] text-ink-2">
@@ -129,7 +129,7 @@ export default function EvidencePage() {
         </p>
         <div
           aria-hidden
-          className="absolute bottom-[-1px] left-0 h-[2px] w-24 bg-cyan"
+          className="absolute bottom-[-1px] left-0 h-[2px] w-24 bg-measure"
         />
       </div>
 

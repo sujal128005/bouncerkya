@@ -4,7 +4,7 @@ import type { Mandate } from "@/schemas";
 export type SignableMandate = Omit<Mandate, "signature">;
 
 /** Version tag — a future field change gets a new tag, not a silent break. */
-export const MANDATE_PAYLOAD_VERSION = "bouncer.mandate.v1";
+export const MANDATE_PAYLOAD_VERSION = "stealth.mandate.v1";
 
 /**
  * The exact bytes that get signed and verified.

@@ -55,7 +55,7 @@ export function createRazorpayOrdersApi(options?: {
   }
 
   if (!isTestModeKey(key_id)) {
-    // Bouncer is a demo. A live key here would move real money on an ALLOW.
+    // STEALTH is a demo. A live key here would move real money on an ALLOW.
     throw new Error(
       `Refusing to use a non-test Razorpay key (${key_id.slice(0, 8)}…). Only rzp_test_ keys are permitted.`,
     );

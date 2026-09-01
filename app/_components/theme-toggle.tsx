@@ -20,7 +20,7 @@ import { useCallback, useSyncExternalStore } from "react";
  * the server genuinely cannot know which theme this particular viewer picked.
  */
 
-const STORAGE_KEY = "bouncer.theme";
+const STORAGE_KEY = "stealth.theme";
 type Theme = "dark" | "light";
 
 /** Subscribers, so a toggle in one place would update any other instance. */

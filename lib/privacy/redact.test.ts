@@ -18,7 +18,7 @@ import {
 const SAMPLES = [
   "acc_QK19xTdP",
   "nnc_a1f4c9d2e7b30465",
-  "kms://bouncer/agent-keys/vega-01",
+  "kms://stealth/agent-keys/vega-01",
   "ed25519:15d9k/gZIzECPZVm4XkehyPj4n1ISjjf+Xv5M9qQdO/C87IjocHwj7bvYsHpkzu4SiyWR0TfVCX8HMbnHUuBw==",
 ];
 

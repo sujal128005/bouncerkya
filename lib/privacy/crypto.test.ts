@@ -4,6 +4,7 @@ import { describe, expect, it } from "vitest";
 import {
   DecryptionError,
   ENCRYPTION_KEY_ENV,
+  blobVersion,
   decryptField,
   encryptField,
   encryptionConfigured,
@@ -135,5 +136,66 @@ describe("encryptField / decryptField", () => {
     for (const value of ["", "₹20,000.00 — gift card", "日本語", "a".repeat(5000)]) {
       expect(decryptField(encryptField(value, AAD, KEY), AAD, KEY)).toBe(value);
     }
+  });
+});
+
+/*
+ * The rename from Bouncer to STEALTH moved the ciphertext prefix from `bnc1`
+ * to `stl1`. That prefix is inside the AAD, so it is not a label: change it
+ * without care and every row already in a database stops authenticating. The
+ * failure would arrive as "could not be decrypted", which reads like a wrong
+ * key, and the natural response to a wrong key is to generate a new one and
+ * lose the data for good.
+ */
+describe("reading values written before the rename", () => {
+  const MODEL = "CartItem";
+  const FIELD = "name";
+  const ID = "itm_0001";
+  const PLAIN = "Strider Flow 3 Running Shoes";
+
+  /** Byte-for-byte how the pre-rename code wrote a value. */
+  const writtenAsBnc1 = () =>
+    encryptField(PLAIN, fieldAad(MODEL, FIELD, ID, "bnc1"), KEY).replace(
+      /^stl1\./,
+      "bnc1.",
+    );
+
+  it("new values are written under the current scheme", () => {
+    expect(encryptField(PLAIN, AAD, KEY).startsWith("stl1.")).toBe(true);
+  });
+
+  it("a bnc1 row still decrypts, under its own scheme", () => {
+    const legacy = writtenAsBnc1();
+    expect(legacy.startsWith("bnc1.")).toBe(true);
+    expect(
+      decryptField(legacy, fieldAad(MODEL, FIELD, ID, "bnc1"), KEY),
+    ).toBe(PLAIN);
+  });
+
+  it("a bnc1 row does NOT authenticate under the new scheme's AAD", () => {
+    // The guarantee that makes the version meaningful rather than cosmetic.
+    expect(() =>
+      decryptField(writtenAsBnc1(), fieldAad(MODEL, FIELD, ID, "stl1"), KEY),
+    ).toThrow(DecryptionError);
+  });
+
+  it("recognises both schemes as ours, so re-encryption stays idempotent", () => {
+    expect(isEncrypted(writtenAsBnc1())).toBe(true);
+    expect(isEncrypted(encryptField(PLAIN, AAD, KEY))).toBe(true);
+    expect(isEncrypted("acc_QK19xTdP")).toBe(false);
+    expect(isEncrypted("xxxx.a.b.c")).toBe(false);
+  });
+
+  it("reports the scheme a stored value was written under", () => {
+    expect(blobVersion(writtenAsBnc1())).toBe("bnc1");
+    expect(blobVersion(encryptField(PLAIN, AAD, KEY))).toBe("stl1");
+    expect(blobVersion("not encrypted")).toBeNull();
+  });
+
+  it("relocation is still refused across schemes", () => {
+    const legacy = writtenAsBnc1();
+    expect(() =>
+      decryptField(legacy, fieldAad(MODEL, FIELD, "itm_0002", "bnc1"), KEY),
+    ).toThrow(DecryptionError);
   });
 });

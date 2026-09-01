@@ -12,7 +12,7 @@ export const Agent = z.object({
   id: Id,
   operatorName: z.string().min(1),
   platform: z.string().min(1),
-  /** Key reference only. Bouncer never stores private key material. */
+  /** Key reference only. STEALTH never stores private key material. */
   publicKeyRef: z.string().min(1),
 });
 

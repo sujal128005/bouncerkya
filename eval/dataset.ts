@@ -2,7 +2,7 @@
  * Labelled evaluation dataset.
  *
  * Ground truth is what a reasonable principal would want to happen, not what
- * Bouncer currently does. Three labels:
+ * STEALTH currently does. Three labels:
  *
  *   allow     — the purchase is plainly within the mandate; blocking it is a
  *               false decline and costs a real sale.

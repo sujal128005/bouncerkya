@@ -66,7 +66,7 @@ export function Reveal({
         type="button"
         onClick={() => void reveal()}
         disabled={state === "loading"}
-        className="rounded-control border border-line px-1.5 py-[1px] font-mono text-label text-ink-3 transition-colors hover:border-cyan hover:text-cyan disabled:opacity-50"
+        className="rounded-control border border-line px-1.5 py-[1px] font-mono text-label text-ink-3 transition-colors hover:border-measure hover:text-measure disabled:opacity-50"
       >
         {state === "loading" ? "…" : state === "failed" ? "retry" : "reveal"}
         <span className="sr-only"> the full {label}</span>

@@ -32,9 +32,9 @@ function money(minor: number): string {
 async function main(): Promise<void> {
   if (!isEngineConfigured()) {
     console.error(
-      "No model backend configured. Set ANTHROPIC_API_KEY, or BOUNCER_ENGINE_PRESET +",
+      "No model backend configured. Set ANTHROPIC_API_KEY, or STEALTH_ENGINE_PRESET +",
     );
-    console.error("BOUNCER_ENGINE_API_KEY in .env (see .env.example), then re-run.");
+    console.error("STEALTH_ENGINE_API_KEY in .env (see .env.example), then re-run.");
     process.exitCode = 1;
     return;
   }

@@ -2,6 +2,7 @@ import type { DiffModelClient } from "./contract";
 import { createAnthropicDiffClient } from "./anthropic";
 import { DEFAULT_MODEL } from "./engine";
 import { createOpenAICompatibleDiffClient } from "./openai-compatible";
+import { setting, settingName, type Setting } from "@/lib/env-vars";
 
 /**
  * Which model backend the Intent-Cart Engine talks to.
@@ -30,7 +31,7 @@ const PRESETS: Record<string, { baseUrl: string; model: string }> = {
     // Google retires model aliases for NEW keys without breaking existing
     // ones, so a preset that worked when written can 404 for a fresh account:
     // "models/gemini-2.5-flash is no longer available to new users". Override
-    // with BOUNCER_ENGINE_MODEL rather than waiting on a code change.
+    // with STEALTH_ENGINE_MODEL rather than waiting on a code change.
     model: "gemini-3.6-flash",
   },
 };
@@ -43,27 +44,35 @@ export type EngineConfig = {
   baseUrl: string | null;
 };
 
-/** Blank and unset are the same thing here: an empty .env line is not a value. */
-function envValue(name: string): string | undefined {
-  const raw = process.env[name]?.trim();
+/**
+ * Reads one of the project's own settings, new name first, old name second.
+ * See lib/env-vars.ts for why both spellings are accepted.
+ */
+function envValue(name: Setting): string | undefined {
+  return setting(name);
+}
+
+/** ANTHROPIC_API_KEY is not ours to rename: it is the vendor's own name. */
+function anthropicKey(): string | undefined {
+  const raw = process.env.ANTHROPIC_API_KEY?.trim();
   return raw ? raw : undefined;
 }
 
 function preset(): { name: string; baseUrl: string; model: string } | null {
-  const name = envValue("BOUNCER_ENGINE_PRESET")?.toLowerCase();
+  const name = envValue("ENGINE_PRESET")?.toLowerCase();
   if (!name) return null;
 
   const found = PRESETS[name];
   if (!found) {
     throw new Error(
-      `Unknown BOUNCER_ENGINE_PRESET "${name}". Known presets: ${Object.keys(PRESETS).join(", ")}.`,
+      `Unknown ${settingName("ENGINE_PRESET")} "${name}". Known presets: ${Object.keys(PRESETS).join(", ")}.`,
     );
   }
   return { name, ...found };
 }
 
 function apiKey(): string | undefined {
-  return envValue("BOUNCER_ENGINE_API_KEY") ?? envValue("ANTHROPIC_API_KEY");
+  return envValue("ENGINE_API_KEY") ?? anthropicKey();
 }
 
 /**
@@ -72,8 +81,8 @@ function apiKey(): string | undefined {
  */
 export function resolveEngineConfig(): EngineConfig | null {
   const chosen = preset();
-  const explicitBaseUrl = envValue("BOUNCER_ENGINE_BASE_URL");
-  const explicitModel = envValue("BOUNCER_ENGINE_MODEL");
+  const explicitBaseUrl = envValue("ENGINE_BASE_URL");
+  const explicitModel = envValue("ENGINE_MODEL");
 
   if (!apiKey()) return null;
 
@@ -145,7 +154,7 @@ export function createDiffClient(): {
   const config = resolveEngineConfig();
   if (!config) {
     throw new Error(
-      "No model backend configured. Set ANTHROPIC_API_KEY, or BOUNCER_ENGINE_PRESET + BOUNCER_ENGINE_API_KEY.",
+      `No model backend configured. Set ANTHROPIC_API_KEY, or ${settingName("ENGINE_PRESET")} + ${settingName("ENGINE_API_KEY")}.`,
     );
   }
 
@@ -155,7 +164,7 @@ export function createDiffClient(): {
 
   if (!config.model) {
     throw new Error(
-      "BOUNCER_ENGINE_MODEL is required when BOUNCER_ENGINE_BASE_URL is set without a preset.",
+      `${settingName("ENGINE_MODEL")} is required when ${settingName("ENGINE_BASE_URL")} is set without a preset.`,
     );
   }
 

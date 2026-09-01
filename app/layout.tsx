@@ -16,13 +16,13 @@ import { SiteFooter } from "@/app/_components/site-footer";
 import { TopBar } from "@/app/_components/top-bar";
 
 export const metadata: Metadata = {
-  title: "Bouncer · Know Your Agent",
+  title: "STEALTH · Know Your Agent",
   description:
     "Trust gateway for AI-driven checkout: verifies that what an agent is buying matches what its human authorized.",
   // Attribution in the document head as well as in the footer, so it survives
   // a screenshot, a scrape, and anyone who reads the page source.
-  authors: [{ name: "Sujal Negi", url: "https://sujalnegi.tech" }],
-  creator: "Sujal Negi",
+  authors: [{ name: "Made Navya", url: "https://linkedin.com/in/navya-made-7236b633a/" }],
+  creator: "Made Navya",
 };
 
 /*
@@ -35,7 +35,7 @@ export const metadata: Metadata = {
  * (private windows, blocked site data, thumbnail capture). Falling back to the
  * default theme is correct there; an exception in <head> is not.
  */
-const THEME_SCRIPT = `try{var t=localStorage.getItem("bouncer.theme");if(t==="light"||t==="dark"){document.documentElement.dataset.theme=t}}catch(e){}`;
+const THEME_SCRIPT = `try{var t=localStorage.getItem("stealth.theme");if(t==="light"||t==="dark"){document.documentElement.dataset.theme=t}}catch(e){}`;
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
@@ -53,3 +53,5 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     </html>
   );
 }
+
+

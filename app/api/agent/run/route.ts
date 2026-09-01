@@ -63,7 +63,7 @@ export async function POST(request: Request): Promise<Response> {
   if (!isAgentConfigured()) {
     return errorResponse(
       "not_configured",
-      "No model backend is configured on the server. Set ANTHROPIC_API_KEY, or BOUNCER_ENGINE_PRESET and BOUNCER_ENGINE_API_KEY, then restart.",
+      "No model backend is configured on the server. Set ANTHROPIC_API_KEY, or STEALTH_ENGINE_PRESET and STEALTH_ENGINE_API_KEY, then restart.",
       503,
     );
   }

@@ -42,8 +42,8 @@ export function TopBar() {
       */}
       <div className="mx-auto flex h-full max-w-[1440px] items-center gap-4 px-4 sm:gap-6 sm:px-6">
         <Link href="/" className="flex shrink-0 items-baseline gap-2">
-          <span className="bg-gradient-to-r from-accent-strong via-violet to-cyan bg-clip-text font-mono text-lead font-semibold tracking-[0.16em] text-transparent">
-            BOUNCER
+          <span className="bg-gradient-to-r from-accent-strong via-rail to-measure bg-clip-text font-mono text-lead font-semibold tracking-[0.16em] text-transparent">
+            STEALTH
           </span>
           <span className="hidden text-meta text-ink-2 lg:inline">
             Know Your Agent

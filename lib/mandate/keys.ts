@@ -7,7 +7,7 @@ import { canonicalMandatePayload, type SignableMandate } from "./canonical";
 /**
  * Agent key material.
  *
- * `publicKeyRef` on an Agent ("kms://bouncer/agent-keys/vega-01") is a
+ * `publicKeyRef` on an Agent ("kms://stealth/agent-keys/vega-01") is a
  * reference into a key management system, not a key. The keystore is what that
  * reference resolves against: a JSON file outside the application database,
  * because that is the shape a real KMS lookup has — swapping this module for an

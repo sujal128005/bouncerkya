@@ -17,7 +17,7 @@ import { listScenarios } from "@/lib/scenarios";
  * This route used to `redirect("/console")`, which meant the first thing any
  * visitor saw was eight hex ids and a dense evidence grid, with the sentence
  * explaining the product two thousand pixels below in the footer. A reader who
- * does not already know what Bouncer is could not find out.
+ * does not already know what STEALTH is could not find out.
  *
  * So this page answers three questions in order, and nothing else: what
  * problem is this, how does it work, and what has actually been measured. The
@@ -45,7 +45,7 @@ const KIND_LABEL: Record<Stage["kind"], string> = {
  * lands on the single place judgement enters the system.
  */
 const KIND_STYLE: Record<Stage["kind"], string> = {
-  deterministic: "border-cyan-line bg-cyan-soft text-cyan",
+  deterministic: "border-measure-line bg-measure-soft text-measure",
   model: "border-accent bg-accent text-white",
   human: "border-stepup-line bg-stepup-soft text-stepup",
 };
@@ -53,12 +53,12 @@ const KIND_STYLE: Record<Stage["kind"], string> = {
 /*
  * The stage number takes the same hue as its kind, so the reader learns the
  * colour once and can then count deterministic stages without reading a word:
- * five cyan, one indigo. The human stage is amber because it IS the step-up
+ * five measure, one indigo. The human stage is amber because it IS the step-up
  * stage -- that is the one place a functional colour legitimately appears
  * outside a verdict, and it appears there because it means the same thing.
  */
 const KIND_RING: Record<Stage["kind"], string> = {
-  deterministic: "border-cyan-line bg-cyan-soft text-cyan",
+  deterministic: "border-measure-line bg-measure-soft text-measure",
   model: "border-accent bg-accent-soft text-accent-strong",
   human: "border-stepup-line bg-stepup-soft text-stepup",
 };
@@ -101,9 +101,9 @@ function StageRow({ stage }: { stage: Stage }) {
 /** Four counters, four decorative hues, none of them a verdict colour. */
 const STAT_TONE = {
   indigo: { rule: "border-accent", value: "text-accent-strong" },
-  cyan: { rule: "border-cyan-line", value: "text-cyan" },
-  violet: { rule: "border-violet-line", value: "text-violet" },
-  fuchsia: { rule: "border-fuchsia-line", value: "text-fuchsia" },
+  measure: { rule: "border-measure-line", value: "text-measure" },
+  rail: { rule: "border-rail-line", value: "text-rail" },
+  evidence: { rule: "border-evidence-line", value: "text-evidence" },
 } as const;
 
 function Stat({
@@ -175,13 +175,13 @@ export default async function OverviewPage() {
           <p className="label-caps text-accent-strong">Know Your Agent</p>
           <h1 className="font-display mt-3 max-w-[22ch] text-hero font-bold text-ink">
             An agent is about to spend{" "}
-            <span className="bg-gradient-to-r from-accent-strong via-violet to-cyan bg-clip-text text-transparent">
+            <span className="bg-gradient-to-r from-accent-strong via-rail to-measure bg-clip-text text-transparent">
               your money
             </span>
             .
           </h1>
           <p className="mt-5 max-w-[66ch] text-head leading-[1.55] text-ink-2">
-            Bouncer sits between an AI shopping agent and Razorpay checkout. It
+            STEALTH sits between an AI shopping agent and Razorpay checkout. It
             verifies the mandate the human signed, diffs the cart against what
             that mandate actually authorized, and allows, blocks, or asks, all
             before anything reaches payment.
@@ -197,9 +197,9 @@ export default async function OverviewPage() {
             </Link>
             <Link
               href="/evidence"
-              className="inline-flex h-11 items-center gap-2 rounded-control border border-line-strong bg-surface px-5 font-medium text-ink transition-colors hover:border-cyan hover:text-cyan"
+              className="inline-flex h-11 items-center gap-2 rounded-control border border-line-strong bg-surface px-5 font-medium text-ink transition-colors hover:border-measure hover:text-measure"
             >
-              <IconVerdict className="h-4 w-4 text-cyan" />
+              <IconVerdict className="h-4 w-4 text-measure" />
               What has been measured
             </Link>
             <span className="font-mono text-label text-ink-3">
@@ -210,14 +210,14 @@ export default async function OverviewPage() {
           {/* One line of authorship, below the calls to action rather than
               beside them, so it never competes with what the page is for. */}
           <a
-            href="https://sujalnegi.tech"
+            href="https://linkedin.com/in/navya-made-7236b633a/"
             target="_blank"
             rel="noreferrer noopener"
             className="group mt-6 inline-flex items-baseline gap-1.5 text-meta text-ink-3 transition-colors hover:text-ink-2"
           >
             Built by
-            <span className="bg-gradient-to-r from-accent-strong via-violet to-cyan bg-clip-text font-medium text-transparent">
-              Sujal Negi
+            <span className="bg-gradient-to-r from-accent-strong via-rail to-measure bg-clip-text font-medium text-transparent">
+              Made Navya
             </span>
             <span
               aria-hidden
@@ -225,7 +225,7 @@ export default async function OverviewPage() {
             >
               &#8599;
             </span>
-            <span className="sr-only">(opens sujalnegi.tech in a new tab)</span>
+            <span className="sr-only">(opens LinkedIn in a new tab)</span>
           </a>
         </div>
         <div aria-hidden className="accent-rule absolute inset-x-0 bottom-0 h-px" />
@@ -236,7 +236,7 @@ export default async function OverviewPage() {
       <section className="grid grid-cols-1 gap-8 border-b border-line py-9 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
         <div>
           <h2 className="font-display flex items-center gap-2 text-head font-bold text-ink">
-            <IconAgent className="h-5 w-5 text-fuchsia" />
+            <IconAgent className="h-5 w-5 text-evidence" />
             The problem
           </h2>
           <p className="mt-3 max-w-[62ch] text-body leading-[1.7] text-ink-2">
@@ -250,7 +250,7 @@ export default async function OverviewPage() {
         </div>
         <div>
           <h2 className="font-display flex items-center gap-2 text-head font-bold text-ink">
-            <IconVerdict className="h-5 w-5 text-cyan" />
+            <IconVerdict className="h-5 w-5 text-measure" />
             The position taken here
           </h2>
           <p className="mt-3 max-w-[62ch] text-body leading-[1.7] text-ink-2">
@@ -265,7 +265,7 @@ export default async function OverviewPage() {
       </section>
 
       {/* -------------------------------------------------------- pipeline */}
-      <section className="band-violet -mx-6 border-b border-line px-6 py-9">
+      <section className="band-rail -mx-6 border-b border-line px-6 py-9">
         <h2 className="font-display text-head font-bold text-ink">
           What happens to one checkout
         </h2>
@@ -283,7 +283,7 @@ export default async function OverviewPage() {
 
       {/* ----------------------------------------------------------- state */}
       {counts ? (
-        <section className="band-cyan -mx-6 border-b border-line px-6 py-9">
+        <section className="band-measure -mx-6 border-b border-line px-6 py-9">
           <h2 className="font-display text-head font-bold text-ink">
             In this deployment
           </h2>
@@ -299,19 +299,19 @@ export default async function OverviewPage() {
               note="seeded, plus any live run"
             />
             <Stat
-              tone="cyan"
+              tone="measure"
               label="Blocked pre-model"
               value={String(counts.blockedBeforeModel)}
               note="bad credential, no model cost"
             />
             <Stat
-              tone="violet"
+              tone="rail"
               label="Sent to a human"
               value={String(counts.escalated)}
               note="policy would not decide alone"
             />
             <Stat
-              tone="fuchsia"
+              tone="evidence"
               label="Audit chain"
               value={String(counts.auditEvents)}
               note={counts.auditValid ? "events · chain verified" : "events · CHAIN BROKEN"}
@@ -333,21 +333,21 @@ export default async function OverviewPage() {
           {
             href: "/approvals",
             Icon: IconHuman,
-            tone: "border-t-violet text-violet hover:border-violet-line",
+            tone: "border-t-rail text-rail hover:border-rail-line",
             title: "Approvals",
-            body: "The queue of attempts Bouncer would not decide alone. Approve or reject one and watch it land in the audit chain.",
+            body: "The queue of attempts STEALTH would not decide alone. Approve or reject one and watch it land in the audit chain.",
           },
           {
             href: "/evidence",
             Icon: IconVerdict,
-            tone: "border-t-cyan text-cyan hover:border-cyan-line",
+            tone: "border-t-measure text-measure hover:border-measure-line",
             title: "Evidence",
             body: "100,000-case credential benchmark, the semantic evaluation, the Razorpay verification, and what each one does not prove.",
           },
           {
             href: "/privacy",
             Icon: IconMandate,
-            tone: "border-t-fuchsia text-fuchsia hover:border-fuchsia-line",
+            tone: "border-t-evidence text-evidence hover:border-evidence-line",
             title: "Privacy",
             body: "The cart reaches the model. The shopper does not. Three controls, each with the limit it does not cover.",
           },
@@ -375,3 +375,6 @@ export default async function OverviewPage() {
     </main>
   );
 }
+
+
+

@@ -14,7 +14,7 @@ import { Mandate, PurchaseRequest, type AuthorizationDiff } from "@/schemas";
 import { evaluatePurchaseRequest, type PipelineDeps } from "./evaluate";
 
 const AGENT_ID = "agt_vega_01";
-const KEY_REF = "kms://bouncer/agent-keys/vega-01";
+const KEY_REF = "kms://stealth/agent-keys/vega-01";
 const NOW = new Date("2026-08-25T10:00:00.000Z");
 
 const keyPair = generateAgentKeyPair();
@@ -282,7 +282,7 @@ describe("stage 4 — threshold policy over a real diff", () => {
 /**
  * THE MODEL IS NOT THE SECURITY AUTHORITY.
  *
- * Bouncer's central architectural claim is that the engine RECOMMENDS and the
+ * STEALTH's central architectural claim is that the engine RECOMMENDS and the
  * deterministic policy DECIDES. A judge is entitled to ask "what happens if
  * the AI lies?", and the answer has to be a test rather than a paragraph.
  *

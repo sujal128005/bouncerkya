@@ -1,26 +1,50 @@
 @import "tailwindcss";
 
 /*
- * Bouncer design tokens — dark console.
+ * STEALTH design tokens.
  *
  * COLOUR POLICY
  *
- * There are two colour systems here and they must not be confused.
+ * Two colour systems, and they must not be confused.
  *
- *   1. DECORATIVE. Indigo, cyan, violet and fuchsia. Used freely on surfaces,
- *      section bands, headers, rails, icons and gradients. They carry identity
+ *   1. DECORATIVE. Steel blue and petrol, plus two neutral greys. Used on
+ *      surfaces, section bands, headers, rails and icons. They carry identity
  *      and hierarchy, and nothing else. None of them is a status.
  *
  *   2. FUNCTIONAL. Emerald, amber and rose-red, and ONLY these three, and only
  *      ever meaning ALLOW, STEP_UP and DECLINE. Nothing decorative may borrow
  *      those hues. That reservation is what lets a reader glance at any screen
- *      in this product and know instantly whether they are looking at a verdict
- *      or at furniture — the single most valuable property the palette has, and
- *      the one thing worth giving up saturation elsewhere to keep.
+ *      and know instantly whether they are looking at a verdict or at
+ *      furniture.
  *
- * The decorative set is deliberately chosen from the far side of the wheel
- * (190°–300°) so it cannot be mistaken for the functional set (0°–150°) even
- * at a glance, in a screenshot, or on a badly calibrated projector.
+ * WHY THIS PALETTE AND NOT THE PREVIOUS ONE
+ *
+ * The first version used four saturated hues from 190 to 300 degrees: indigo,
+ * cyan, violet and fuchsia, over a blue-cast slate, with a three-radial
+ * gradient behind the hero. Every one of those choices is a default. Together
+ * they are the house style of a generated interface, and a reader recognises
+ * it before reading a word.
+ *
+ * This one is built on restraint instead. Two real hues carry meaning:
+ *
+ *   accent   212deg, steel blue   interactive, brand, the active nav rule
+ *   measure  195deg, petrol       deterministic stages, benchmarks, anything
+ *                                 that was counted rather than judged
+ *
+ * The other two roles, the pipeline rail and the evidence panels, are NEUTRAL.
+ * They separate by weight and lightness, not by hue. Dropping from four hues
+ * to two is the whole point: hierarchy carried by type, spacing and border
+ * weight reads as considered, and a fifth colour would only dilute the two
+ * that mean something.
+ *
+ * The base is a true graphite with no blue cast, because the blue-slate dark
+ * theme is itself a tell.
+ *
+ * CONTRAST, MEASURED, not eyeballed. Against the dark canvas: accent 5.45:1,
+ * accent-strong 7.68:1, measure 5.44:1, rail 6.05:1, evidence 8.41:1, body ink
+ * 15.95:1, secondary ink 8.04:1. Every decorative hue sits at least 32 degrees
+ * away from the nearest reserved verdict hue, so no piece of furniture can be
+ * mistaken for a decision at a glance or in a screenshot.
  *
  * Status is additionally never carried by colour alone: every outcome renders
  * as glyph + colour + word, so it survives greyscale and a screen reader.
@@ -36,43 +60,45 @@
     "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 
   /* ---------------------------------------------------------- neutrals */
-  /* Slate with a blue cast. A neutral grey dark theme reads as "unstyled";
-   * the cast is what makes this look like a deliberate surface. */
-  --color-canvas: #0c0e15;
-  --color-surface: #141824;
+  /* True graphite. The previous palette's blue cast is the single most
+   * recognisable marker of a generated dark theme. */
+  --color-canvas: #0e1013;
+  --color-surface: #16191d;
   /* Recessed, not raised: read-only evidence sits BELOW the panel holding it.
    * On dark that means darker, which is the reverse of the light theme and the
    * reason these are tokens rather than literal colours at each call site. */
-  --color-inset: #10131d;
-  --color-inset-strong: #0d1017;
-  --color-line: #252b3d;
-  --color-line-soft: #1c2130;
-  --color-line-strong: #38405a;
-  --color-ink: #eef1f9;
-  --color-ink-2: #a6afc6;
-  --color-ink-3: #737d96;
+  --color-inset: #121519;
+  --color-inset-strong: #0f1215;
+  --color-line: #262a30;
+  --color-line-soft: #1c2025;
+  --color-line-strong: #39404a;
+  --color-ink: #e9ebee;
+  --color-ink-2: #a2a9b3;
+  --color-ink-3: #737b85;
 
   /* ------------------------------------------------------- decorative */
-  /* Brand. Interactive affordances, the active nav rule, primary buttons. */
-  --color-accent: #6366f1;
-  --color-accent-strong: #818cf8;
-  --color-accent-soft: #1a1c3d;
-  --color-accent-line: #3f3fa8;
+  /* Steel blue. Interactive affordances, the active nav rule, primary buttons.
+   * Deliberately a working blue rather than a brand purple. */
+  --color-accent: #5c8cc4;
+  --color-accent-strong: #7ba8db;
+  --color-accent-soft: #131b25;
+  --color-accent-line: #2f4a68;
 
-  /* Cyan — deterministic stages, benchmarks, anything measured. */
-  --color-cyan: #22d3ee;
-  --color-cyan-soft: #07242e;
-  --color-cyan-line: #14596b;
+  /* Petrol. Deterministic stages, benchmarks, anything measured. 195deg keeps
+   * it clear of the emerald that means ALLOW. */
+  --color-measure: #4a92ab;
+  --color-measure-soft: #101a1e;
+  --color-measure-line: #2a5260;
 
-  /* Violet — credentials and the pipeline rail. */
-  --color-violet: #a78bfa;
-  --color-violet-soft: #1e1338;
-  --color-violet-line: #5b3fa8;
+  /* Neutral. The pipeline rail and credential material. No hue on purpose. */
+  --color-rail: #8a929c;
+  --color-rail-soft: #191c21;
+  --color-rail-line: #3b434d;
 
-  /* Fuchsia — evidence and disclosure. 300°, nowhere near the verdict reds. */
-  --color-fuchsia: #e879f9;
-  --color-fuchsia-soft: #2a0f31;
-  --color-fuchsia-line: #7d3691;
+  /* Neutral, one step lighter. Evidence and disclosure. */
+  --color-evidence: #a6adb6;
+  --color-evidence-soft: #1b1e23;
+  --color-evidence-line: #454d57;
 
   /* ------------------------------------------------- type scale (7 tiers) */
   --text-label: 12px;
@@ -95,8 +121,8 @@
   --radius-panel: 8px;
 
   /* ---------------------------------------------- functional, RESERVED */
-  /* Brightened from the light theme: the light-mode #1b6e45 is unreadable on
-   * a #0c0e15 canvas. Same meanings, same three slots. */
+  /* Unchanged by the retheme. A verdict colour that shifted with a visual
+   * refresh would be a verdict colour nobody could rely on. */
   --color-allow: #34d399;
   --color-allow-soft: #052a20;
   --color-allow-line: #10664c;
@@ -117,45 +143,44 @@
  * time in one sitting. Light exists because a projector in a bright room is
  * the one place dark themes genuinely lose, and a demo is exactly that room.
  *
- * Only the tokens are redefined. Every utility in the product resolves through
- * var(--color-*), so nothing below this line needs a light-mode variant and no
- * component knows which theme it is in. That is the whole reason the palette
- * was built as tokens rather than literal colours at each call site.
+ * Only the tokens are redefined. Every utility resolves through var(--color-*),
+ * so nothing below this line needs a light variant and no component knows which
+ * theme it is in.
  *
- * The decorative hues are darkened rather than reused: #22d3ee on white is
- * around 1.9:1 and unreadable. The functional three are the light-mode values
- * from the original palette, unchanged, so a verdict means the same thing and
- * looks the same in both themes.
+ * The paper is a warm neutral rather than a blue-grey, for the same reason the
+ * dark canvas is graphite. The decorative hues are darkened rather than reused:
+ * the dark-mode steel blue on white is around 2.6:1 and unreadable. The
+ * functional three are unchanged.
  */
 :root[data-theme="light"] {
-  --color-canvas: #f4f5f7;
+  --color-canvas: #f5f5f4;
   --color-surface: #ffffff;
   /* Recessed is LIGHTER than the surface here, the reverse of dark mode. */
-  --color-inset: #fafafa;
-  --color-inset-strong: #f4f4f5;
-  --color-line: #e2e4e9;
-  --color-line-soft: #eeeff2;
-  --color-line-strong: #cbcfd6;
-  --color-ink: #14161a;
-  --color-ink-2: #4d525c;
-  --color-ink-3: #767c88;
+  --color-inset: #fafaf9;
+  --color-inset-strong: #f2f2f1;
+  --color-line: #e3e3e1;
+  --color-line-soft: #eeeeec;
+  --color-line-strong: #c9c9c6;
+  --color-ink: #16181b;
+  --color-ink-2: #4b5158;
+  --color-ink-3: #6e757d;
 
-  --color-accent: #4f46e5;
-  --color-accent-strong: #4338ca;
-  --color-accent-soft: #eef2ff;
-  --color-accent-line: #c7d2fe;
+  --color-accent: #2f5f96;
+  --color-accent-strong: #24507f;
+  --color-accent-soft: #eef3f9;
+  --color-accent-line: #c5d7e9;
 
-  --color-cyan: #0e7490;
-  --color-cyan-soft: #ecfeff;
-  --color-cyan-line: #a5f3fc;
+  --color-measure: #23697a;
+  --color-measure-soft: #edf5f7;
+  --color-measure-line: #bcdae0;
 
-  --color-violet: #6d28d9;
-  --color-violet-soft: #f5f3ff;
-  --color-violet-line: #ddd6fe;
+  --color-rail: #5a636e;
+  --color-rail-soft: #f1f2f3;
+  --color-rail-line: #d7dade;
 
-  --color-fuchsia: #a21caf;
-  --color-fuchsia-soft: #fdf4ff;
-  --color-fuchsia-line: #f5d0fe;
+  --color-evidence: #4c545e;
+  --color-evidence-soft: #f0f1f2;
+  --color-evidence-line: #d2d5d9;
 
   --color-allow: #1b6e45;
   --color-allow-soft: #f1f8f4;
@@ -233,52 +258,48 @@
 }
 
 /*
- * The hero band. One gradient, in the decorative range only, plus a soft
- * radial bloom. Gradients were previously banned outright; they are allowed
- * now, and this is the only place a large one appears — a gradient behind
- * every panel would flatten the hierarchy the borders are carrying.
+ * The hero band.
+ *
+ * The previous version stacked three saturated radial gradients in indigo,
+ * violet and cyan. A large multi-hue bloom is the most recognisable single
+ * marker of a generated page, and it was competing with the panels that hold
+ * the actual content.
+ *
+ * This is one soft wash of the brand hue, low in the corner, over a quiet
+ * vertical lift from surface to canvas. It gives the hero a place to sit
+ * without asking to be looked at.
  */
 @utility hero-band {
   background:
     radial-gradient(
-      1200px 620px at 8% 8%,
-      color-mix(in oklab, var(--color-accent) 42%, transparent),
-      transparent 66%
-    ),
-    radial-gradient(
-      900px 520px at 78% 14%,
-      color-mix(in oklab, var(--color-violet) 32%, transparent),
+      1100px 520px at 12% 0%,
+      color-mix(in oklab, var(--color-accent) 15%, transparent),
       transparent 62%
     ),
-    radial-gradient(
-      820px 460px at 96% 96%,
-      color-mix(in oklab, var(--color-cyan) 20%, transparent),
-      transparent 64%
-    ),
     linear-gradient(
-      168deg,
-      color-mix(in oklab, var(--color-surface) 78%, var(--color-accent)),
-      var(--color-canvas) 82%
+      180deg,
+      color-mix(in oklab, var(--color-surface) 88%, var(--color-accent)),
+      var(--color-canvas) 78%
     );
 }
 
 /*
- * A tinted band for a section that should read as its own place. Very low
- * saturation: at full strength these would compete with the panels sitting on
- * top of them, which is where the actual content is.
+ * A band for a section that should read as its own place. Almost nothing:
+ * these sit UNDER panels, and a tint strong enough to notice on its own is a
+ * tint that fights the content on top of it.
  */
-@utility band-violet {
+@utility band-rail {
   background: linear-gradient(
     180deg,
-    color-mix(in oklab, var(--color-violet) 7%, var(--color-canvas)),
+    color-mix(in oklab, var(--color-rail) 6%, var(--color-canvas)),
     var(--color-canvas)
   );
 }
 
-@utility band-cyan {
+@utility band-measure {
   background: linear-gradient(
     180deg,
-    color-mix(in oklab, var(--color-cyan) 6%, var(--color-canvas)),
+    color-mix(in oklab, var(--color-measure) 5%, var(--color-canvas)),
     var(--color-canvas)
   );
 }
@@ -286,68 +307,56 @@
 /* Panel that wants to look lit rather than merely bordered. */
 @utility panel-lift {
   box-shadow:
-    0 1px 0 0 color-mix(in oklab, var(--color-ink) 6%, transparent) inset,
-    0 18px 40px -28px rgb(0 0 0 / 0.9);
+    0 1px 0 0 color-mix(in oklab, var(--color-ink) 5%, transparent) inset,
+    0 18px 40px -30px rgb(0 0 0 / 0.9);
 }
 
 :root[data-theme="light"] .panel-lift {
   box-shadow:
     0 1px 2px 0 rgb(16 18 24 / 0.04),
-    0 12px 28px -20px rgb(16 18 24 / 0.28);
+    0 12px 28px -20px rgb(16 18 24 / 0.24);
 }
 
 /*
  * The light theme gets much weaker tints.
  *
- * The same percentages that read as a subtle glow against a near-black canvas
- * read as a heavy lavender wash against a near-white one, which is both ugly
- * and generic. Colour on light backgrounds has to be roughly a third of the
- * strength to carry the same weight, so these are re-specified rather than
- * inherited.
+ * The same percentage that reads as a subtle lift against a near-black canvas
+ * reads as a heavy wash against a near-white one. Colour on light backgrounds
+ * has to be roughly a third of the strength to carry the same weight.
  */
 :root[data-theme="light"] .hero-band {
   background:
     radial-gradient(
-      1100px 560px at 6% 4%,
-      color-mix(in oklab, var(--color-accent) 13%, transparent),
-      transparent 62%
-    ),
-    radial-gradient(
-      820px 460px at 80% 10%,
-      color-mix(in oklab, var(--color-violet) 10%, transparent),
+      950px 460px at 10% 0%,
+      color-mix(in oklab, var(--color-accent) 9%, transparent),
       transparent 58%
     ),
-    radial-gradient(
-      700px 400px at 98% 96%,
-      color-mix(in oklab, var(--color-cyan) 8%, transparent),
-      transparent 60%
-    ),
-    linear-gradient(180deg, var(--color-surface), var(--color-canvas) 88%);
+    linear-gradient(180deg, var(--color-surface), var(--color-canvas) 84%);
 }
 
-:root[data-theme="light"] .band-violet {
+:root[data-theme="light"] .band-rail {
   background: linear-gradient(
     180deg,
-    color-mix(in oklab, var(--color-violet) 3%, var(--color-canvas)),
+    color-mix(in oklab, var(--color-rail) 3%, var(--color-canvas)),
     var(--color-canvas)
   );
 }
 
-:root[data-theme="light"] .band-cyan {
+:root[data-theme="light"] .band-measure {
   background: linear-gradient(
     180deg,
-    color-mix(in oklab, var(--color-cyan) 3%, var(--color-canvas)),
+    color-mix(in oklab, var(--color-measure) 3%, var(--color-canvas)),
     var(--color-canvas)
   );
 }
 
-/* A thin luminous rule, used to cap the hero and to underline section bands. */
+/* A hairline rule capping the hero. Two stops. The previous four-stop version
+ * put a small rainbow across the top of the page. */
 @utility accent-rule {
   background: linear-gradient(
     90deg,
     var(--color-accent),
-    var(--color-violet) 38%,
-    var(--color-cyan) 72%,
+    var(--color-measure) 46%,
     transparent
   );
 }

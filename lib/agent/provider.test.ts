@@ -15,15 +15,15 @@ afterEach(() => {
 describe("agent provider under a misconfigured preset", () => {
   const stubUnknownPreset = () => {
     vi.stubEnv("ANTHROPIC_API_KEY", "");
-    vi.stubEnv("BOUNCER_ENGINE_API_KEY", "key");
-    vi.stubEnv("BOUNCER_ENGINE_BASE_URL", "");
-    vi.stubEnv("BOUNCER_AGENT_MODEL", "");
-    vi.stubEnv("BOUNCER_ENGINE_PRESET", "not-a-real-preset");
+    vi.stubEnv("STEALTH_ENGINE_API_KEY", "key");
+    vi.stubEnv("STEALTH_ENGINE_BASE_URL", "");
+    vi.stubEnv("STEALTH_AGENT_MODEL", "");
+    vi.stubEnv("STEALTH_ENGINE_PRESET", "not-a-real-preset");
   };
 
   it("resolveAgentConfig propagates the error, because it returns a config", () => {
     stubUnknownPreset();
-    expect(() => resolveAgentConfig()).toThrow(/Unknown BOUNCER_ENGINE_PRESET/);
+    expect(() => resolveAgentConfig()).toThrow(/Unknown STEALTH_ENGINE_PRESET/);
   });
 
   it("isAgentConfigured answers false instead of throwing", () => {
@@ -39,9 +39,9 @@ describe("agent provider under a misconfigured preset", () => {
 
   it("still reports not configured when nothing at all is set", () => {
     vi.stubEnv("ANTHROPIC_API_KEY", "");
-    vi.stubEnv("BOUNCER_ENGINE_API_KEY", "");
-    vi.stubEnv("BOUNCER_ENGINE_PRESET", "");
-    vi.stubEnv("BOUNCER_ENGINE_BASE_URL", "");
+    vi.stubEnv("STEALTH_ENGINE_API_KEY", "");
+    vi.stubEnv("STEALTH_ENGINE_PRESET", "");
+    vi.stubEnv("STEALTH_ENGINE_BASE_URL", "");
     expect(isAgentConfigured()).toBe(false);
     expect(describeAgent()).toBe("not configured");
   });

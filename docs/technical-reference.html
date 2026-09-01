@@ -1,0 +1,1239 @@
+<title>Know Your Agent</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+
+<style>
+  /*
+   * STEALTH technical reference.
+   *
+   * The palette, the type and the colour policy are the product's own, not a
+   * document theme invented for this page: the same four decorative hues
+   * (190-300 degrees) and the same three reserved functional hues, so a reader
+   * who has seen the console reads this the same way. Dark first, because the
+   * product is dark first.
+   */
+
+  /* ---------------------------------------------------------------- DARK */
+  :root {
+    --canvas: #0e1013;
+    --surface: #16191d;
+    --inset: #121519;
+    --line: #262a30;
+    --line-soft: #1c2025;
+    --line-strong: #39404a;
+    --ink: #e9ebee;
+    --ink-2: #a2a9b3;
+    --ink-3: #737b85;
+
+    --accent: #5c8cc4;
+    --accent-strong: #7ba8db;
+    --accent-soft: #131b25;
+    --measure: #4a92ab;
+    --measure-soft: #101a1e;
+    --measure-line: #2a5260;
+    --rail: #8a929c;
+    --rail-soft: #191c21;
+    --rail-line: #3b434d;
+    --evidence: #a6adb6;
+    --evidence-soft: #1b1e23;
+    --evidence-line: #454d57;
+
+    /* RESERVED. Only ever allow / step-up / decline. */
+    --allow: #34d399;
+    --allow-soft: #052a20;
+    --allow-line: #10664c;
+    --stepup: #fbbf24;
+    --stepup-soft: #2b1f06;
+    --stepup-line: #8a6011;
+    --decline: #fb7185;
+    --decline-soft: #2e0f18;
+    --decline-line: #9c2f43;
+
+    --shadow: 0 18px 40px -28px rgb(0 0 0 / 0.9);
+    color-scheme: dark;
+  }
+
+  /* --------------------------------------------------------------- LIGHT */
+  /* System-light viewers, unless they explicitly asked for dark. */
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) {
+      --canvas: #f5f5f4;
+      --surface: #ffffff;
+      --inset: #fafaf9;
+      --line: #e3e3e1;
+      --line-soft: #eeeeec;
+      --line-strong: #c9c9c6;
+      --ink: #16181b;
+      --ink-2: #4b5158;
+      --ink-3: #6e757d;
+
+      --accent: #2f5f96;
+      --accent-strong: #24507f;
+      --accent-soft: #eef3f9;
+      --measure: #23697a;
+      --measure-soft: #edf5f7;
+      --measure-line: #bcdae0;
+      --rail: #5a636e;
+      --rail-soft: #f1f2f3;
+      --rail-line: #d7dade;
+      --evidence: #4c545e;
+      --evidence-soft: #f0f1f2;
+      --evidence-line: #d2d5d9;
+
+      --allow: #1b6e45;
+      --allow-soft: #f1f8f4;
+      --allow-line: #c2e0d0;
+      --stepup: #8a5a12;
+      --stepup-soft: #fbf7ee;
+      --stepup-line: #e8d5b0;
+      --decline: #a62b22;
+      --decline-soft: #fcf4f3;
+      --decline-line: #eec9c5;
+
+      --shadow: 0 12px 28px -20px rgb(16 18 24 / 0.28);
+      color-scheme: light;
+    }
+  }
+
+  /* An explicit light choice wins over a dark OS. */
+  :root[data-theme="light"] {
+    --canvas: #f5f5f4;
+    --surface: #ffffff;
+    --inset: #fafaf9;
+    --line: #e3e3e1;
+    --line-soft: #eeeeec;
+    --line-strong: #c9c9c6;
+    --ink: #16181b;
+    --ink-2: #4b5158;
+    --ink-3: #6e757d;
+
+    --accent: #2f5f96;
+    --accent-strong: #24507f;
+    --accent-soft: #eef3f9;
+    --measure: #23697a;
+    --measure-soft: #edf5f7;
+    --measure-line: #bcdae0;
+    --rail: #5a636e;
+    --rail-soft: #f1f2f3;
+    --rail-line: #d7dade;
+    --evidence: #4c545e;
+    --evidence-soft: #f0f1f2;
+    --evidence-line: #d2d5d9;
+
+    --allow: #1b6e45;
+    --allow-soft: #f1f8f4;
+    --allow-line: #c2e0d0;
+    --stepup: #8a5a12;
+    --stepup-soft: #fbf7ee;
+    --stepup-line: #e8d5b0;
+    --decline: #a62b22;
+    --decline-soft: #fcf4f3;
+    --decline-line: #eec9c5;
+
+    --shadow: 0 12px 28px -20px rgb(16 18 24 / 0.28);
+    color-scheme: light;
+  }
+
+  /* ------------------------------------------------------------ elements */
+  * { box-sizing: border-box; }
+
+  body {
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: "Space Grotesk", "Inter", ui-sans-serif, system-ui, "Segoe UI",
+      Roboto, Helvetica, Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    margin: 0;
+  }
+
+  code, pre, .mono, table td.num, .id {
+    font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, Consolas,
+      monospace;
+    font-variant-ligatures: none;
+  }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 24px; }
+
+  /* ---------------------------------------------------------------- hero */
+  .hero {
+    background:
+      radial-gradient(1100px 560px at 8% 6%,
+        color-mix(in oklab, var(--accent) 34%, transparent), transparent 64%),
+      radial-gradient(820px 460px at 82% 12%,
+        color-mix(in oklab, var(--rail) 24%, transparent), transparent 60%),
+      linear-gradient(170deg,
+        color-mix(in oklab, var(--surface) 80%, var(--accent)),
+        var(--canvas) 84%);
+    border-bottom: 1px solid var(--line);
+  }
+  @media (prefers-color-scheme: light) {
+    :root:not([data-theme="dark"]) .hero {
+      background:
+        radial-gradient(1000px 520px at 6% 4%,
+          color-mix(in oklab, var(--accent) 11%, transparent), transparent 60%),
+        radial-gradient(760px 420px at 82% 10%,
+          color-mix(in oklab, var(--rail) 9%, transparent), transparent 56%),
+        linear-gradient(180deg, var(--surface), var(--canvas) 88%);
+    }
+  }
+  :root[data-theme="light"] .hero {
+    background:
+      radial-gradient(1000px 520px at 6% 4%,
+        color-mix(in oklab, var(--accent) 11%, transparent), transparent 60%),
+      radial-gradient(760px 420px at 82% 10%,
+        color-mix(in oklab, var(--rail) 9%, transparent), transparent 56%),
+      linear-gradient(180deg, var(--surface), var(--canvas) 88%);
+  }
+
+  .hero .wrap { padding-top: 56px; padding-bottom: 44px; }
+
+  .eyebrow {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-strong);
+    margin: 0;
+  }
+
+  h1 {
+    font-size: clamp(34px, 5vw, 52px);
+    line-height: 1.06;
+    letter-spacing: -0.022em;
+    font-weight: 700;
+    margin: 14px 0 0;
+    max-width: 20ch;
+    text-wrap: balance;
+  }
+  h1 .grad {
+    background: linear-gradient(96deg, var(--accent-strong), var(--rail) 45%, var(--measure));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .lede {
+    font-size: 18px;
+    line-height: 1.6;
+    color: var(--ink-2);
+    max-width: 68ch;
+    margin: 20px 0 0;
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 28px;
+    margin: 28px 0 0;
+    padding: 16px 0 0;
+    border-top: 1px solid var(--line);
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 12.5px;
+    color: var(--ink-3);
+  }
+  .meta b { color: var(--ink-2); font-weight: 500; }
+  .meta a { color: var(--accent-strong); }
+
+  /* --------------------------------------------------------------- layout */
+  .body { display: block; padding: 40px 0 72px; }
+  @media (min-width: 1080px) {
+    .body {
+      display: grid;
+      grid-template-columns: 220px minmax(0, 1fr);
+      gap: 56px;
+      align-items: start;
+    }
+  }
+
+  nav.toc { display: none; }
+  @media (min-width: 1080px) {
+    nav.toc {
+      display: block;
+      position: sticky;
+      top: 24px;
+      font-size: 13.5px;
+    }
+  }
+  nav.toc ol { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 2px; counter-reset: toc; }
+  nav.toc a {
+    display: block;
+    padding: 5px 10px;
+    color: var(--ink-3);
+    text-decoration: none;
+    border-left: 2px solid var(--line);
+    transition: color .15s, border-color .15s;
+  }
+  nav.toc a:hover { color: var(--ink); border-left-color: var(--accent); }
+  nav.toc .lbl {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    padding: 0 10px 8px;
+    display: block;
+  }
+
+  main { min-width: 0; }
+
+  section { scroll-margin-top: 20px; padding-bottom: 8px; }
+  section + section { margin-top: 52px; }
+
+  h2 {
+    font-size: 26px;
+    line-height: 1.2;
+    letter-spacing: -0.015em;
+    font-weight: 700;
+    margin: 0 0 6px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--line);
+    position: relative;
+    text-wrap: balance;
+  }
+  h2::after {
+    content: "";
+    position: absolute;
+    left: 0; bottom: -1px;
+    width: 68px; height: 2px;
+    background: var(--accent);
+  }
+  section:nth-of-type(4n+2) h2::after { background: var(--measure); }
+  section:nth-of-type(4n+3) h2::after { background: var(--rail); }
+  section:nth-of-type(4n+4) h2::after { background: var(--evidence); }
+
+  h3 {
+    font-size: 17px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 28px 0 6px;
+  }
+
+  p { max-width: 74ch; margin: 12px 0; color: var(--ink-2); }
+  p.tight { margin-top: 6px; }
+  main strong { color: var(--ink); font-weight: 600; }
+  main a { color: var(--accent-strong); }
+
+  ul, ol { max-width: 74ch; color: var(--ink-2); padding-left: 20px; }
+  li { margin: 6px 0; }
+  li::marker { color: var(--ink-3); }
+
+  /* ---------------------------------------------------------------- bits */
+  .panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    box-shadow: var(--shadow);
+    padding: 18px 20px;
+    margin: 20px 0;
+  }
+  .panel.top-cyan { border-top: 2px solid var(--measure); }
+  .panel.top-violet { border-top: 2px solid var(--rail); }
+  .panel.top-fuchsia { border-top: 2px solid var(--evidence); }
+  .panel.top-accent { border-top: 2px solid var(--accent); }
+  .panel > :first-child { margin-top: 0; }
+  .panel > :last-child { margin-bottom: 0; }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    border: 1px solid var(--line);
+    background: var(--inset);
+    border-radius: 4px;
+    padding: 1px 7px;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11.5px;
+    letter-spacing: 0.03em;
+    color: var(--ink-2);
+    white-space: nowrap;
+  }
+  .chip.allow { color: var(--allow); border-color: var(--allow-line); background: var(--allow-soft); }
+  .chip.stepup { color: var(--stepup); border-color: var(--stepup-line); background: var(--stepup-soft); }
+  .chip.decline { color: var(--decline); border-color: var(--decline-line); background: var(--decline-soft); }
+  .chip.model { color: #fff; border-color: var(--accent); background: var(--accent); }
+  .chip.det { color: var(--measure); border-color: var(--measure-line); background: var(--measure-soft); }
+
+  .scroll { overflow-x: auto; margin: 18px 0; }
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    min-width: 520px;
+    font-size: 14px;
+  }
+  th {
+    text-align: left;
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink-3);
+    font-weight: 500;
+    padding: 8px 14px 8px 0;
+    border-bottom: 1px solid var(--line);
+    white-space: nowrap;
+  }
+  td {
+    padding: 9px 14px 9px 0;
+    border-bottom: 1px solid var(--line-soft);
+    color: var(--ink-2);
+    vertical-align: top;
+  }
+  td.num, td .id { font-variant-numeric: tabular-nums; color: var(--ink); }
+  td:last-child, th:last-child { padding-right: 0; }
+  tr:last-child td { border-bottom: none; }
+
+  pre {
+    background: var(--inset);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 14px 16px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.75;
+    color: var(--ink-2);
+    margin: 18px 0;
+  }
+  p code, li code, td code {
+    background: var(--inset);
+    border: 1px solid var(--line-soft);
+    border-radius: 3px;
+    padding: 0 4px;
+    font-size: 0.88em;
+    color: var(--ink);
+  }
+
+  figure { margin: 24px 0; }
+  figure svg { display: block; width: 100%; max-width: 100%; height: auto; }
+  figcaption {
+    font-size: 13px;
+    color: var(--ink-3);
+    margin-top: 10px;
+    max-width: 74ch;
+  }
+
+  .two {
+    display: grid;
+    gap: 20px 32px;
+    margin: 18px 0;
+  }
+  @media (min-width: 720px) { .two { grid-template-columns: 1fr 1fr; } }
+
+  .lbl {
+    font-family: "IBM Plex Mono", monospace;
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin: 0 0 4px;
+  }
+  .lbl.good { color: var(--allow); }
+  .lbl.limit { color: var(--stepup); }
+  .two p { margin: 0; font-size: 14px; }
+
+  .figures {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 16px 24px;
+    padding: 14px 0;
+    border-top: 1px solid var(--line-soft);
+    border-bottom: 1px solid var(--line-soft);
+    margin: 18px 0;
+  }
+  .figures div { min-width: 0; }
+  .figures dt { font-family: "IBM Plex Mono", monospace; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); }
+  .figures dd { margin: 3px 0 0; font-family: "IBM Plex Mono", monospace; font-size: 19px; font-weight: 600; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .figures dd.hi { color: var(--measure); }
+
+  footer.doc {
+    border-top: 1px solid var(--line);
+    background: var(--surface);
+    margin-top: 56px;
+  }
+  footer.doc .wrap { padding-top: 28px; padding-bottom: 36px; }
+  footer.doc p { font-size: 13px; color: var(--ink-3); max-width: 78ch; }
+  footer.doc a { color: var(--accent-strong); }
+
+  a:focus-visible { outline: 2px solid var(--accent-strong); outline-offset: 2px; border-radius: 2px; }
+
+  /* ----------------------------------------------------------------- print
+   * "Save as PDF" is how this document gets submitted, so the print sheet is
+   * part of the deliverable rather than an afterthought.
+   *
+   * It deliberately does NOT force a palette. Chromium emulates a light
+   * colour-scheme when printing, so a browser export comes out as the light
+   * document, which is the right default for something a reader may print or
+   * skim in a PDF viewer. A reader who wants the dark version can stamp
+   * data-theme="dark" before printing.
+   *
+   * What the sheet does control is pagination, because the default breaks
+   * tables across pages and orphans headings from the content under them.
+   */
+  @media print {
+    * {
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    @page { margin: 14mm 12mm; }
+
+    body { font-size: 10.5pt; line-height: 1.5; }
+    .wrap { max-width: none; padding: 0; }
+    .hero .wrap { padding-top: 0; padding-bottom: 22px; }
+    h1 { font-size: 30pt; }
+    .lede { font-size: 12pt; }
+
+    /* The sticky rail is a screen affordance; a printed page has no scroll. */
+    nav.toc { display: none !important; }
+    .body { display: block; padding: 20px 0 0; }
+
+    /* Nothing that reads as one object should split across a page break. */
+    figure, .panel, table, pre, .figures, .two { break-inside: avoid; page-break-inside: avoid; }
+    tr { break-inside: avoid; page-break-inside: avoid; }
+    h2, h3 { break-after: avoid; page-break-after: avoid; }
+    section + section { margin-top: 34px; }
+
+    /* Links are not clickable on paper, so show where they lead. */
+    .meta a::after, footer.doc a::after { content: " (" attr(href) ")"; font-size: 8.5pt; color: var(--ink-3); }
+
+    .scroll { overflow: visible; }
+    table { min-width: 0; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+</style>
+
+<header class="hero">
+  <div class="wrap">
+    <p class="eyebrow">Technical reference</p>
+    <h1>Know your agent, <span class="grad">before it spends</span>.</h1>
+    <p class="lede">
+      STEALTH is a trust gateway between an AI shopping agent and Razorpay
+      checkout. An agent presents a signed mandate and a cart; STEALTH verifies
+      the credential, diffs the cart against what the human actually authorized,
+      and allows, blocks, or asks. A model is used for exactly one step, and it
+      never gets the final word.
+    </p>
+    <div class="meta">
+      <span><b>Author</b> Sujal Negi &middot; <a href="https://sujalnegi.tech" target="_blank" rel="noreferrer noopener">sujalnegi.tech</a></span>
+      <span><b>Built for</b> Razorpay AI Buildathon</span>
+      <span><b>Stack</b> Next.js 16 &middot; TypeScript &middot; Prisma &middot; SQLite</span>
+      <span><b>Tests</b> 257</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap body">
+  <nav class="toc" aria-label="Contents">
+    <span class="lbl">Contents</span>
+    <ol>
+      <li><a href="#problem">The problem</a></li>
+      <li><a href="#architecture">Architecture</a></li>
+      <li><a href="#pipeline">The six stages</a></li>
+      <li><a href="#failclosed">Fail-closed design</a></li>
+      <li><a href="#trust">Trust boundaries</a></li>
+      <li><a href="#privacy">Privacy architecture</a></li>
+      <li><a href="#audit">Audit chain</a></li>
+      <li><a href="#results">Measured results</a></li>
+      <li><a href="#limits">Limits and instability</a></li>
+      <li><a href="#reproduce">Reproducing it</a></li>
+    </ol>
+  </nav>
+
+  <main>
+    <!-- ============================================================ -->
+    <section id="problem">
+      <h2>The problem</h2>
+      <p>
+        An AI shopping agent reads product pages written by strangers. Those
+        pages can lie, and they can carry instructions aimed at the model rather
+        than at the shopper. Give that agent a payment method and its worst day
+        becomes the merchant's chargeback and the shopper's problem.
+      </p>
+      <p>
+        The common answer is to make the agent harder to fool: better prompts,
+        better guardrails, a more careful model. That is worth doing and it is
+        not sufficient. Resistance to manipulation is a property of one model on
+        one day. It is not something you can put in a contract, audit after the
+        fact, or point at when a customer disputes a charge.
+      </p>
+      <p>
+        <strong>STEALTH takes the opposite position: do not trust the agent,
+        check it.</strong> The human signs a mandate that states what may be
+        bought and up to how much. Every checkout is measured against that
+        signed document by deterministic code. The agent's goodwill is not an
+        input.
+      </p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="architecture">
+      <h2>Architecture</h2>
+      <p>
+        STEALTH sits in the payment path, not beside it. Nothing reaches
+        Razorpay that has not been through all six stages, and the only
+        component with any authority to allow a purchase is a deterministic
+        threshold rule.
+      </p>
+
+      <figure>
+        <svg viewBox="0 0 950 470" role="img" aria-label="Architecture diagram: an untrusted shopping agent presents a mandate and cart to the STEALTH gateway; stage three sends the cart, with no identifying field, to a third-party model provider; stage five exchanges a step-up with the principal; and only an ALLOW leaves the gateway for Razorpay.">
+          <defs>
+            <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
+            </marker>
+            <marker id="ahv" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" fill="#8a929c"/>
+            </marker>
+            <marker id="aha" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" fill="#fbbf24"/>
+            </marker>
+            <marker id="ahg" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" fill="#34d399"/>
+            </marker>
+          </defs>
+
+          <!-- untrusted agent -->
+          <rect x="8" y="40" width="150" height="86" rx="6" fill="none" stroke="currentColor" stroke-width="1.2" stroke-dasharray="5 4" opacity="0.85"/>
+          <text x="83" y="32" text-anchor="middle" font-size="11" font-family="IBM Plex Mono, monospace" fill="#fb7185" letter-spacing="1">UNTRUSTED</text>
+          <text x="83" y="76" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">Shopping agent</text>
+          <text x="83" y="95" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">reads merchant pages</text>
+          <text x="83" y="111" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">may be hijacked</text>
+
+          <g stroke="currentColor" stroke-width="1.3" fill="none" marker-end="url(#ah)">
+            <path d="M158 83 L262 83"/>
+          </g>
+          <text x="210" y="73" text-anchor="middle" font-size="10" font-family="IBM Plex Mono, monospace" fill="currentColor" opacity="0.8">mandate + cart</text>
+
+          <!-- gateway -->
+          <rect x="268" y="40" width="372" height="320" rx="8" fill="none" stroke="#5c8cc4" stroke-width="1.4"/>
+          <text x="454" y="30" text-anchor="middle" font-size="11" font-family="IBM Plex Mono, monospace" fill="#7ba8db" letter-spacing="1.4">STEALTH GATEWAY</text>
+
+          <g font-size="12.5" fill="currentColor">
+            <rect x="288" y="60" width="332" height="38" rx="5" fill="none" stroke="currentColor" opacity="0.55"/>
+            <text x="302" y="84">1 &#183; Mandate verifier</text>
+            <text x="606" y="84" text-anchor="end" font-size="10.5" font-family="IBM Plex Mono, monospace" opacity="0.65">134 &#181;s</text>
+
+            <rect x="288" y="108" width="332" height="38" rx="5" fill="none" stroke="currentColor" opacity="0.55"/>
+            <text x="302" y="132">2 &#183; Evidence extraction</text>
+            <text x="606" y="132" text-anchor="end" font-size="10.5" font-family="IBM Plex Mono, monospace" opacity="0.65">deterministic</text>
+
+            <rect x="288" y="156" width="332" height="38" rx="5" fill="none" stroke="#5c8cc4" stroke-width="1.4"/>
+            <text x="302" y="180">3 &#183; Intent-cart diff</text>
+            <text x="606" y="180" text-anchor="end" font-size="10.5" font-family="IBM Plex Mono, monospace" fill="#7ba8db">model call</text>
+
+            <rect x="288" y="204" width="332" height="38" rx="5" fill="none" stroke="currentColor" opacity="0.55"/>
+            <text x="302" y="228">4 &#183; Threshold policy</text>
+            <text x="606" y="228" text-anchor="end" font-size="10.5" font-family="IBM Plex Mono, monospace" opacity="0.65">decides</text>
+
+            <rect x="288" y="252" width="332" height="38" rx="5" fill="none" stroke="currentColor" opacity="0.55"/>
+            <text x="302" y="276">5 &#183; Human escalation</text>
+            <text x="606" y="276" text-anchor="end" font-size="10.5" font-family="IBM Plex Mono, monospace" fill="#fbbf24">step-up</text>
+
+            <rect x="288" y="300" width="332" height="30" rx="5" fill="none" stroke="currentColor" opacity="0.35"/>
+            <text x="302" y="320" font-size="12">6 &#183; Audit chain &#183; SHA-256 over every step</text>
+          </g>
+
+          <!-- model provider, level with stage 3 -->
+          <rect x="730" y="138" width="200" height="74" rx="6" fill="none" stroke="#8a929c" stroke-width="1.2" stroke-dasharray="5 4"/>
+          <text x="830" y="130" text-anchor="middle" font-size="11" font-family="IBM Plex Mono, monospace" fill="#8a929c" letter-spacing="1">THIRD PARTY</text>
+          <text x="830" y="172" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">Model provider</text>
+          <text x="830" y="192" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">off this machine</text>
+          <g stroke="#8a929c" stroke-width="1.3" fill="none" marker-end="url(#ahv)">
+            <path d="M622 175 L724 175"/>
+          </g>
+          <text x="673" y="166" text-anchor="middle" font-size="9.5" font-family="IBM Plex Mono, monospace" fill="#8a929c">cart only</text>
+          <text x="673" y="190" text-anchor="middle" font-size="9.5" font-family="IBM Plex Mono, monospace" fill="#8a929c">no identity</text>
+
+          <!-- principal, level with stage 5 -->
+          <rect x="730" y="241" width="200" height="60" rx="6" fill="none" stroke="#fbbf24" stroke-width="1.2"/>
+          <text x="830" y="265" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">Principal</text>
+          <text x="830" y="285" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">signs, and answers</text>
+          <g stroke="#fbbf24" stroke-width="1.3" fill="none" marker-start="url(#aha)" marker-end="url(#aha)">
+            <path d="M622 271 L724 271"/>
+          </g>
+          <text x="673" y="262" text-anchor="middle" font-size="9.5" font-family="IBM Plex Mono, monospace" fill="#fbbf24">ask</text>
+          <text x="673" y="287" text-anchor="middle" font-size="9.5" font-family="IBM Plex Mono, monospace" fill="#fbbf24">answer</text>
+
+          <!-- razorpay, below the gateway -->
+          <g stroke="#34d399" stroke-width="1.3" fill="none" marker-end="url(#ahg)">
+            <path d="M454 360 L454 396"/>
+          </g>
+          <text x="466" y="382" text-anchor="start" font-size="10.5" font-family="IBM Plex Mono, monospace" fill="#34d399">ALLOW only</text>
+          <rect x="354" y="400" width="200" height="58" rx="6" fill="none" stroke="#34d399" stroke-width="1.2"/>
+          <text x="454" y="425" text-anchor="middle" font-size="13" font-weight="600" fill="currentColor">Razorpay</text>
+          <text x="454" y="444" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.7">test mode, order only</text>
+        </svg>
+        <figcaption>
+          Every path to Razorpay runs through all six stages, and only an ALLOW
+          reaches it. The model sits outside the machine and receives the cart
+          without any identifying field; the principal is reached only when the
+          policy declines to decide alone.
+        </figcaption>
+      </figure>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="pipeline">
+      <h2>The six stages</h2>
+      <p>
+        Stage order is a safety property, not a style choice. The cheapest and
+        most certain check runs first, so a forged credential is rejected for
+        the price of an elliptic-curve verification and never gets to spend a
+        model call, let alone reach a payment rail.
+      </p>
+
+      <div class="scroll">
+        <table>
+          <thead>
+            <tr><th>Stage</th><th>Kind</th><th>What it decides</th><th>Cost</th><th>On failure</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>1 Mandate verifier</strong><br><span class="id" style="font-size:12px">lib/mandate</span></td>
+              <td><span class="chip det">deterministic</span></td>
+              <td>Is the credential well-formed, signed by this agent's key, unexpired, and unspent?</td>
+              <td class="num">~134 µs</td>
+              <td><span class="chip decline">DECLINE</span></td>
+            </tr>
+            <tr>
+              <td><strong>2 Evidence extraction</strong><br><span class="id" style="font-size:12px">lib/extraction</span></td>
+              <td><span class="chip det">deterministic</span></td>
+              <td>Separates merchant assertions from untrusted listing text; runs a closed-taxonomy category scan and an injection-marker scan.</td>
+              <td class="num">sub-ms</td>
+              <td>n/a</td>
+            </tr>
+            <tr>
+              <td><strong>3 Intent-cart diff</strong><br><span class="id" style="font-size:12px">lib/ai</span></td>
+              <td><span class="chip model">model call</span></td>
+              <td>Where does the cart depart from the mandate? Clause by clause, with severity and confidence. <strong>Evidence, not a decision.</strong></td>
+              <td class="num">seconds</td>
+              <td><span class="chip stepup">STEP_UP</span></td>
+            </tr>
+            <tr>
+              <td><strong>4 Threshold policy</strong><br><span class="id" style="font-size:12px">lib/policy</span></td>
+              <td><span class="chip det">deterministic</span></td>
+              <td>Turns the diff into a verdict against fixed thresholds. The only component that can allow a purchase.</td>
+              <td class="num">sub-ms</td>
+              <td>n/a</td>
+            </tr>
+            <tr>
+              <td><strong>5 Human escalation</strong><br><span class="id" style="font-size:12px">lib/step-up</span></td>
+              <td><span class="chip stepup">human</span></td>
+              <td>Anything the policy will not decide alone waits for the principal's answer.</td>
+              <td>as long as it takes</td>
+              <td>stays pending</td>
+            </tr>
+            <tr>
+              <td><strong>6 Audit chain</strong><br><span class="id" style="font-size:12px">lib/audit</span></td>
+              <td><span class="chip det">deterministic</span></td>
+              <td>Appends every step to a SHA-256 hash chain over canonical JSON.</td>
+              <td class="num">sub-ms</td>
+              <td>n/a</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>The separation that matters</h3>
+      <p>
+        Stage 3 produces an <code>AuthorizationDiff</code>: a set of clauses, each
+        naming one dimension (category, budget, quantity, injected instruction),
+        the authorized value, the attempted value, a severity and an
+        explanation. It carries a confidence score. It carries no verdict, and
+        the schema gives it no field in which to express one.
+      </p>
+      <p>
+        Stage 4 reads that object and applies fixed thresholds. The same diff
+        always produces the same verdict. All of the variance in the system
+        lives in stage 3, and none of it can reach a payment without passing
+        through a rule that does not vary.
+      </p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="failclosed">
+      <h2>Fail-closed design</h2>
+      <p>
+        The locked invariant, and the property the whole design is arranged
+        around: <strong>an engine that cannot answer produces STEP_UP, never
+        ALLOW.</strong> Not a timeout, not a malformed response, not a rate
+        limit, not a 500, not a missing API key, not a provider that has been
+        switched off entirely. There is no code path in which the absence of a
+        judgement becomes permission to spend someone's money.
+      </p>
+
+      <figure>
+        <svg viewBox="0 0 880 300" role="img" aria-label="Decision flow: an invalid mandate declines immediately; a valid mandate proceeds to the diff, and an engine failure escalates to a human; only a successful diff reaches the threshold policy, which is the sole producer of an allow.">
+          <defs>
+            <marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+              <path d="M0 0 L10 5 L0 10 z" fill="currentColor"/>
+            </marker>
+          </defs>
+
+          <g fill="none" stroke="currentColor" stroke-width="1.2">
+            <rect x="10" y="118" width="128" height="52" rx="6"/>
+            <rect x="222" y="118" width="128" height="52" rx="6"/>
+            <rect x="434" y="118" width="128" height="52" rx="6"/>
+          </g>
+          <g font-size="12.5" fill="currentColor" text-anchor="middle">
+            <text x="74" y="141">Mandate</text><text x="74" y="158">verifier</text>
+            <text x="286" y="141">Intent-cart</text><text x="286" y="158">diff</text>
+            <text x="498" y="141">Threshold</text><text x="498" y="158">policy</text>
+          </g>
+
+          <g stroke="currentColor" stroke-width="1.3" fill="none" marker-end="url(#a2)">
+            <path d="M138 144 L216 144"/>
+            <path d="M350 144 L428 144"/>
+          </g>
+          <g font-size="10.5" font-family="IBM Plex Mono, monospace" fill="currentColor" text-anchor="middle" opacity="0.8">
+            <text x="177" y="135">valid</text>
+            <text x="389" y="135">diff</text>
+          </g>
+
+          <!-- failure exits -->
+          <g stroke="#fb7185" stroke-width="1.3" fill="none" marker-end="url(#a2)" color="#fb7185">
+            <path d="M74 170 L74 232"/>
+          </g>
+          <rect x="12" y="234" width="124" height="34" rx="5" fill="none" stroke="#fb7185" stroke-width="1.2"/>
+          <text x="74" y="256" text-anchor="middle" font-size="12.5" fill="#fb7185" font-family="IBM Plex Mono, monospace">DECLINE</text>
+          <text x="82" y="205" text-anchor="start" font-size="10.5" font-family="IBM Plex Mono, monospace" fill="#fb7185">bad credential</text>
+
+          <g stroke="#fbbf24" stroke-width="1.3" fill="none" marker-end="url(#a2)" color="#fbbf24">
+            <path d="M286 170 L286 232"/>
+          </g>
+          <rect x="224" y="234" width="124" height="34" rx="5" fill="none" stroke="#fbbf24" stroke-width="1.2"/>
+          <text x="286" y="256" text-anchor="middle" font-size="12.5" fill="#fbbf24" font-family="IBM Plex Mono, monospace">STEP_UP</text>
+          <text x="294" y="205" text-anchor="start" font-size="10.5" font-family="IBM Plex Mono, monospace" fill="#fbbf24">engine failed</text>
+
+          <!-- policy outputs -->
+          <g stroke="currentColor" stroke-width="1.3" fill="none" marker-end="url(#a2)">
+            <path d="M562 132 L646 108"/>
+            <path d="M562 144 L646 144"/>
+            <path d="M562 156 L646 180"/>
+          </g>
+          <rect x="650" y="90" width="124" height="34" rx="5" fill="none" stroke="#34d399" stroke-width="1.2"/>
+          <text x="712" y="112" text-anchor="middle" font-size="12.5" fill="#34d399" font-family="IBM Plex Mono, monospace">ALLOW</text>
+          <rect x="650" y="127" width="124" height="34" rx="5" fill="none" stroke="#fbbf24" stroke-width="1.2"/>
+          <text x="712" y="149" text-anchor="middle" font-size="12.5" fill="#fbbf24" font-family="IBM Plex Mono, monospace">STEP_UP</text>
+          <rect x="650" y="164" width="124" height="34" rx="5" fill="none" stroke="#fb7185" stroke-width="1.2"/>
+          <text x="712" y="186" text-anchor="middle" font-size="12.5" fill="#fb7185" font-family="IBM Plex Mono, monospace">DECLINE</text>
+
+          <!-- The note belongs under the POLICY: it is the component that can
+               allow, not the decline box the arrow used to point at. -->
+          <path d="M498 196 L498 176" stroke="currentColor" stroke-width="1" fill="none" opacity="0.5" marker-end="url(#a2)"/>
+          <text x="498" y="212" text-anchor="middle" font-size="11" fill="currentColor" opacity="0.75">the only component that can allow</text>
+        </svg>
+        <figcaption>
+          Two failure exits, and neither reaches ALLOW. A bad credential
+          declines before any model is called; a failed engine escalates to a
+          human. Only a completed diff, judged by the deterministic policy, can
+          produce an allow.
+        </figcaption>
+      </figure>
+
+      <div class="panel top-cyan">
+        <p class="tight">
+          <strong>This was tested accidentally, at a scale nobody would pay
+          for.</strong> Across abandoned evaluation runs, more than 400 cases
+          were evaluated with no working model backend at all, first when Groq's
+          daily token quota ran out and then Gemini's. Every one of them
+          escalated to a human. Not a single cart was approved without a working
+          engine, under two independent failure modes on two providers.
+        </p>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="trust">
+      <h2>Trust boundaries</h2>
+      <p>
+        Four parties, and STEALTH trusts exactly one of them.
+      </p>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Party</th><th>Trusted?</th><th>Treatment</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>The principal</strong></td>
+              <td><span class="chip allow">trusted</span></td>
+              <td>Their Ed25519 signature over a canonical mandate payload is the root of authority. Nothing else can grant permission.</td>
+            </tr>
+            <tr>
+              <td><strong>The agent</strong></td>
+              <td><span class="chip decline">untrusted</span></td>
+              <td>Software that may be hijacked. It can present a mandate and a cart; it cannot assert that either is acceptable.</td>
+            </tr>
+            <tr>
+              <td><strong>The merchant / listing</strong></td>
+              <td><span class="chip decline">untrusted</span></td>
+              <td>Free text is fenced in tagged delimiters, scanned for injection markers, and passed to the model as data to evaluate. It is quoted as evidence, never obeyed.</td>
+            </tr>
+            <tr>
+              <td><strong>The model provider</strong></td>
+              <td><span class="chip stepup">semi-trusted</span></td>
+              <td>Trusted to return an opinion, never to decide. Its output is schema-validated, its failure escalates, and it is given no identifying field.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>The mandate credential</h3>
+      <p>
+        A mandate is signed with Ed25519 over a canonical JSON payload that
+        binds all of its own fields: principal, agent, category scope, spend
+        cap, currency, expiry and a single-use nonce. Four checks run in order,
+        fail-fast, and the console shows all four including the ones that were
+        never reached.
+      </p>
+      <p>
+        The binding is what makes the interesting attack fail. A
+        <em>cryptographically valid</em> signature lifted from a different
+        mandate passes every structural check; it is caught only because the
+        signature covers a payload containing that mandate's own fields, so it
+        does not verify against these. That family is in the benchmark by name.
+      </p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="privacy">
+      <h2>Privacy architecture</h2>
+      <p>
+        There is no real person's data in this deployment: the principals,
+        carts and merchant ids are fictional and seeded. What follows is
+        therefore not a claim about protecting anyone's information today. It is
+        the privacy engineering the product would need before it could hold real
+        information, built and tested now rather than described as future work.
+      </p>
+
+      <div class="panel top-violet">
+        <h3 style="margin-top:0">1 &middot; Identity never reaches the model provider</h3>
+        <p>
+          An agentic-commerce system has an unusual privacy problem: to decide
+          whether a cart is legitimate, something has to read the cart, and
+          here that something is a language model at a third party. Every byte
+          of the prompt leaves the machine.
+        </p>
+        <div class="two">
+          <div>
+            <p class="lbl good">Sent</p>
+            <p>Authorized categories, spend cap, currency, cart line names,
+            quantities, prices, listing ids, and the untrusted listing text.</p>
+          </div>
+          <div>
+            <p class="lbl limit">Withheld</p>
+            <p>Principal name and id, mandate id, purchase request id, agent id,
+            mandate nonce, signature, merchant account id.</p>
+          </div>
+        </div>
+        <p>
+          Enforced at runtime on the exact string that leaves, not by
+          convention. If a future change ever puts an identifier in the prompt,
+          the guard throws and the call is never made &mdash; and because a failed
+          engine escalates, that regression degrades into a human approval
+          rather than a leak.
+        </p>
+        <div class="two">
+          <div>
+            <p class="lbl good">What it protects</p>
+            <p>The model is handed a shopping basket with no way to know whose
+            it is.</p>
+          </div>
+          <div>
+            <p class="lbl limit">What it does not</p>
+            <p>The cart contents themselves are sent, because judging them is
+            the task. Nothing is claimed about what the provider does with them,
+            how long it retains them, or under whose jurisdiction.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel top-cyan">
+        <h3 style="margin-top:0">2 &middot; Four columns encrypted at rest</h3>
+        <p>
+          AES-256-GCM with a fresh 96-bit IV per value, over the principal's
+          display name, every cart line name, and the session's free text and
+          structured fields. Each ciphertext is additionally bound through the
+          AAD to its exact model, field and row id.
+        </p>
+        <p>
+          That binding is the part worth pausing on. Confidentiality alone would
+          let an attacker with write access <em>move</em> a ciphertext &mdash; swap
+          two cart line names between requests, for instance. Every such move
+          decrypts perfectly under plain AES-GCM, because the bytes are
+          authentic and merely in the wrong place. Binding the AAD to
+          <code>model.field.id</code> turns a silent data-integrity attack into a
+          loud decryption error.
+        </p>
+        <div class="two">
+          <div>
+            <p class="lbl good">What it protects</p>
+            <p>An attacker with the database file and not the key: backups,
+            snapshots, open object storage, a laptop, a support export, a
+            repository someone committed the database into.</p>
+          </div>
+          <div>
+            <p class="lbl limit">What it does not</p>
+            <p>Anyone with the process, the environment or root. The key is an
+            environment variable beside the database: no KMS, no envelope
+            encryption, no rotation tooling. Amounts, categories, outcomes and
+            the audit chain are deliberately in the clear.</p>
+          </div>
+        </div>
+        <p class="tight">
+          A thief with the file learns that a purchase happened, for how much,
+          in what category, and what STEALTH decided. Not whose it was or what
+          was in the basket. The audit chain is deliberately unencrypted: a
+          tamper-evidence log that cannot be checked without a secret is a worse
+          log.
+        </p>
+      </div>
+
+      <div class="panel top-fuchsia">
+        <h3 style="margin-top:0">3 &middot; Credential material redacted server-side</h3>
+        <p>
+          The full signature, nonce, key reference and merchant account id are
+          not in the HTML, the React payload, or view-source. The server sends
+          the truncated form; revealing one is a separate request to an endpoint
+          that accepts four named fields and nothing else. A CSS blur would have
+          left the value in the page and hidden it only from the person already
+          allowed to look.
+        </p>
+        <div class="two">
+          <div>
+            <p class="lbl good">What it protects</p>
+            <p>Everything that reads the page rather than the screen:
+            view-source, devtools, scrapers, archived copies, and every
+            screenshot or recording made during a demo.</p>
+          </div>
+          <div>
+            <p class="lbl limit">What it does not</p>
+            <p>This deployment has no authentication, so anyone who can reach
+            the console can call the reveal endpoint. This is exposure
+            reduction, not access control.</p>
+          </div>
+        </div>
+      </div>
+
+      <h3>Designed, and not built</h3>
+      <p>
+        Named here rather than left for a reviewer to find: authentication and
+        authorization; key management; an access log recording who revealed
+        what; and data retention and deletion, which the append-only audit chain
+        makes a genuine design problem rather than a missing function.
+      </p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="audit">
+      <h2>Audit chain</h2>
+      <p>
+        Every step of every decision is appended to a SHA-256 hash chain over
+        canonical JSON. Each event carries the hash of its predecessor, so
+        editing any stored record breaks every hash after it. Verification is
+        <strong>recomputed on read</strong>, never stored, because a stored
+        "valid" flag is exactly the field an attacker would edit next.
+      </p>
+      <p>
+        Mandate verification works the same way: the console never displays a
+        persisted verdict about a credential. It recomputes the four checks
+        against the live keystore and nonce ledger on every page load, so what
+        you see is the verifier's current output rather than a claim from
+        whenever the row was written.
+      </p>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="results">
+      <h2>Measured results</h2>
+      <p>
+        Every figure below came from a run that can be repeated, and every one
+        states what it does not prove. Two of them came back negative and one
+        documents a bug that shipped and was caught.
+      </p>
+
+      <h3>Credential path at scale</h3>
+      <p class="tight">
+        The credential path is deterministic, so unlike a semantic judgement it
+        can be attacked at scale. 100,000 generated credentials across eight
+        adversarial families, seed 20260829, reproducible on any machine.
+      </p>
+      <dl class="figures">
+        <div><dt>Cases</dt><dd>100,000</dd></div>
+        <div><dt>False accepts</dt><dd class="hi">0</dd></div>
+        <div><dt>False rejects</dt><dd class="hi">0</dd></div>
+        <div><dt>Model calls</dt><dd class="hi">0</dd></div>
+        <div><dt>Throughput</dt><dd>7,487/s</dd></div>
+        <div><dt>Per decision</dt><dd>134 µs</dd></div>
+      </dl>
+      <div class="two">
+        <div><p class="lbl good">What this proves</p><p>No attack family in the set slips through, and the fail-closed path costs microseconds rather than a model call.</p></div>
+        <div><p class="lbl limit">What it does not</p><p>A correctness and throughput result, not an accuracy claim. Ed25519 either verifies or it does not; a near-perfect score is the expected outcome and demonstrates no clever discrimination.</p></div>
+      </div>
+
+      <h3>The benchmark can fail, and that is proven</h3>
+      <p class="tight">
+        "Zero false accepts" means nothing if the harness cannot report one.
+        That is not hypothetical: an earlier version of this benchmark reported
+        491,000 verifications per second while <em>every single verification was
+        failing</em>. It was timing the early-exit rejection path, and the number
+        looked 63&times; better than the truth while measuring nothing.
+      </p>
+      <dl class="figures">
+        <div><dt>Injected bug</dt><dd>1% always-valid</dd></div>
+        <div><dt>Expected catches</dt><dd>~449</dd></div>
+        <div><dt>Actual catches</dt><dd>479</dd></div>
+        <div><dt>Result</dt><dd class="hi">PASS</dd></div>
+      </dl>
+      <p class="tight">
+        If <code>--self-test</code> ever prints FAIL, every clean number this
+        harness has produced is void.
+      </p>
+
+      <h3>Decision quality and the semantic path</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Run</th><th>Cases</th><th>Precision</th><th>Recall</th><th>False allows</th><th>False declines</th></tr></thead>
+          <tbody>
+            <tr><td><code>npm run eval</code><br><span style="font-size:12.5px">labelled, real pipeline</span></td><td class="num">21</td><td class="num">100.0%</td><td class="num">92.9%</td><td class="num">0</td><td class="num">0</td></tr>
+            <tr><td><code>npm run eval:semantic</code><br><span style="font-size:12.5px">boundary cases, model in the loop</span></td><td class="num">46<br><span style="font-size:12px">43 scored</span></td><td class="num">100.0%</td><td class="num">84.6%</td><td class="num">0</td><td class="num">0</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        <strong>Every single disagreement in the semantic run is the ₹1 boundary
+        family</strong>, and always in the same direction: escalated to a human
+        instead of declined, four for four, across two different model
+        providers. The model rates a one-rupee overrun as medium severity rather
+        than high, so the policy escalates. Reasonable people can disagree about
+        which is correct &mdash; a cart ₹1 over the limit is exactly the kind of
+        thing a person should adjudicate &mdash; but the behaviour is consistent,
+        explainable, and never resolves toward allowing.
+      </p>
+      <div class="two">
+        <div><p class="lbl good">What this proves</p><p>On these sets the pipeline never allowed something it should have blocked.</p></div>
+        <div><p class="lbl limit">What it does not</p><p>n = 46, not the 250 planned: two providers hit daily quotas mid-run, and the honest number is what was measured rather than what was intended.</p></div>
+      </div>
+
+      <h3>Injection resistance</h3>
+      <p class="tight">
+        The first measurement was worthless and the reason is worth stating.
+        Baseline exposure was 0 of 7 runs: the catalog's browse endpoint returns
+        no descriptions, the injection lives in one, and the agent bought off
+        the browse list without opening a product page. That "0% hit rate"
+        measured browsing behaviour, not injection resistance.
+      </p>
+      <p class="tight">
+        Two things changed, and both affect <em>delivery</em>, not persuasion:
+        adding an item to the cart now requires having viewed it, and the
+        poisoned listing was repriced to become the cheapest running shoe. The
+        injection text, the agent's system prompt and the agent's freedom to
+        comply were deliberately left alone.
+      </p>
+      <dl class="figures">
+        <div><dt>Exposure after the fix</dt><dd>3 of 4 runs</dd></div>
+        <div><dt>Followed the injection</dt><dd class="hi">0 of 3</dd></div>
+      </dl>
+      <p class="tight">
+        With n = 3 this is a weak signal and no resistance rate is claimed from
+        it. It is reported because rewording the injection until the demo worked
+        would make every other number here suspect.
+      </p>
+
+      <h3>Razorpay, claim by claim</h3>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Claim</th><th>Status</th><th>Evidence</th></tr></thead>
+          <tbody>
+            <tr><td>Webhook signature verification</td><td><span class="chip allow">verified</span></td><td>HMAC-SHA256 over the raw body, constant-time compare, wrong signature rejected</td></tr>
+            <tr><td>Live-mode keys are refused</td><td><span class="chip allow">verified in production</span></td><td>Fired on a real <code>rzp_live_</code> credential that reached <code>.env</code> by mistake; three layers refused it, the error masked the key, no API call was made</td></tr>
+            <tr><td>Idempotency</td><td><span class="chip allow">verified</span></td><td>Database-unique on request and decision id; a repeat returns the existing order</td></tr>
+            <tr><td>SDK, auth, minor units, receipt</td><td><span class="chip allow">verified</span></td><td><code>npm run razorpay:verify</code>, 294 ms round trip</td></tr>
+            <tr><td>An order exists in the dashboard</td><td><span class="chip allow">verified by a human</span></td><td><span class="id">order_TVI6K1KFNkmPxM</span> &middot; ₹1,001.01 &middot; 30 Aug 2026</td></tr>
+            <tr><td>No payment is captured</td><td><span class="chip allow">verified</span></td><td>Dashboard shows 0 captured, 0 refunds, 0 disputes, 0 failed</td></tr>
+            <tr><td><strong>A pipeline ALLOW creates the order</strong></td><td><span class="chip stepup">not verified</span></td><td>The confirmed order came from a direct probe. The ALLOW&rarr;order path is unit-tested and database-enforced but has not been observed end to end against the live API</td></tr>
+            <tr><td>Webhook delivery from Razorpay</td><td><span class="chip stepup">not verified</span></td><td>Requires a public URL. The handler is tested; the delivery is not</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="limits">
+      <h2>Limits and instability</h2>
+
+      <h3>Clause severity is not stable across identical input</h3>
+      <p class="tight">
+        The seeded commercial-blender case, run four times against the same
+        model with the same cart and the same mandate:
+      </p>
+      <div class="scroll">
+        <table>
+          <thead><tr><th>Run</th><th>Confidence</th><th>Severity</th><th>Outcome</th></tr></thead>
+          <tbody>
+            <tr><td class="num">1</td><td class="num">0.86</td><td>high</td><td><span class="chip decline">DECLINE</span></td></tr>
+            <tr><td class="num">2</td><td class="num">0.82</td><td>high</td><td><span class="chip decline">DECLINE</span></td></tr>
+            <tr><td class="num">3</td><td class="num">0.85</td><td>medium + low</td><td><span class="chip stepup">STEP_UP</span></td></tr>
+            <tr><td class="num">4</td><td class="num">0.85</td><td>high</td><td><span class="chip decline">DECLINE</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>
+        This is disclosed rather than hidden behind a cached fixture. Note the
+        direction: the unstable run <em>escalated to a human</em>. The
+        instability moves between blocking and asking, never toward allowing,
+        which is precisely why the deciding component is deterministic.
+      </p>
+
+      <h3>Not claimed</h3>
+      <ul>
+        <li>That the agent is hard to fool. The gateway is not premised on it.</li>
+        <li>That the model is calibrated. It is asked for evidence, not a verdict, and its confidence is one input to a fixed threshold.</li>
+        <li>That this is production-ready. It is unauthenticated, single-tenant, SQLite-backed, and holds its encryption key beside its database.</li>
+        <li>That the semantic numbers generalise. n = 46 on deliberately hard cases is a small set, and it is reported as one.</li>
+      </ul>
+    </section>
+
+    <!-- ============================================================ -->
+    <section id="reproduce">
+      <h2>Reproducing it</h2>
+      <pre>npm install
+npm run privacy:keygen        <span style="color:var(--ink-3)"># paste the printed line into .env</span>
+npm run db:reset              <span style="color:var(--ink-3)"># with the dev server stopped</span>
+npm run dev
+
+npm test                      <span style="color:var(--ink-3)"># 257 unit and integration tests</span>
+npm run eval                  <span style="color:var(--ink-3)"># 21 labelled cases, real pipeline</span>
+npm run eval:credentials      <span style="color:var(--ink-3)"># 100,000 adversarial credentials</span>
+npm run eval:credentials -- 100000 --self-test
+npm run eval:semantic         <span style="color:var(--ink-3)"># boundary cases, model in the loop</span>
+npm run razorpay:verify       <span style="color:var(--ink-3)"># one real order, test mode only</span>
+npm run privacy:audit         <span style="color:var(--ink-3)"># tracked secrets and ignore rules</span></pre>
+      <p>
+        The at-rest claim is checked against the file rather than the code:
+        after a reseed, search the raw SQLite database for the names the console
+        displays. They are not there, and the ciphertext markers are.
+      </p>
+      <p>
+        The credential and semantic numbers must never be summed. A credential
+        rejection and a semantic judgement are not the same unit of work, and
+        adding them produces a throughput figure that describes nothing.
+      </p>
+    </section>
+  </main>
+</div>
+
+<footer class="doc">
+  <div class="wrap">
+    <p>
+      STEALTH &mdash; a trust gateway between an AI shopping agent and checkout.
+      Built for the Razorpay AI Buildathon by
+      <a href="https://sujalnegi.tech" target="_blank" rel="noreferrer noopener">Sujal Negi</a>.
+      Razorpay is in test mode throughout; no payment is ever captured, and the
+      principals, agents and carts are fictional seeded data.
+    </p>
+  </div>
+</footer>

@@ -25,7 +25,7 @@
  * LABEL PROVENANCE: same discipline as the credential generator. The intent is
  * chosen first, the artifacts are derived from it, and the label is read off
  * the intent. This file imports nothing from `lib/policy` or `lib/ai` and holds
- * no copy of Bouncer's thresholds.
+ * no copy of STEALTH's thresholds.
  *
  * The `step_up` label means "a reasonable human reviewer could go either way".
  * Those cases are excluded from precision and recall — scoring them would be

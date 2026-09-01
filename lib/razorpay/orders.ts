@@ -8,7 +8,7 @@ import { createRazorpayOrdersApi, type RazorpayOrdersApi } from "./client";
 /**
  * Order creation for an ALLOW decision.
  *
- * This is the only place in Bouncer where a decision becomes a money-moving
+ * This is the only place in STEALTH where a decision becomes a money-moving
  * side effect, and it runs at exactly one point in the pipeline: after the
  * Policy Engine has returned ALLOW. There is no path from a DECLINE, a STEP_UP,
  * or an engine failure to this function.
@@ -77,13 +77,13 @@ export async function createOrderForDecision(
   try {
     created = await orders.create({
       // Razorpay amounts are in the smallest currency unit — the same integer
-      // paise Bouncer has carried end to end, so there is no conversion here.
+      // paise STEALTH has carried end to end, so there is no conversion here.
       amount: input.amountMinor,
       currency,
       receipt: input.purchaseRequestId,
       notes: {
-        bouncer_purchase_request: input.purchaseRequestId,
-        bouncer_policy_decision: input.policyDecisionId,
+        stealth_purchase_request: input.purchaseRequestId,
+        stealth_policy_decision: input.policyDecisionId,
         ...input.notes,
       },
     });

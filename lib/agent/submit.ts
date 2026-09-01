@@ -54,7 +54,7 @@ async function mintRunIdentity(mode: string): Promise<{
 }> {
   const short = randomUUID().replace(/-/g, "").slice(0, 8);
   const agentId = `agt_live_${short}`;
-  const publicKeyRef = `kms://bouncer/agent-keys/live-${short}`;
+  const publicKeyRef = `kms://stealth/agent-keys/live-${short}`;
   const keyPair = generateAgentKeyPair();
 
   const keystore = readKeystore();
@@ -71,7 +71,7 @@ async function mintRunIdentity(mode: string): Promise<{
     data: {
       id: agentId,
       operatorName: `Live Demo Agent (${mode})`,
-      platform: "bouncer-demo-harness/1.0",
+      platform: "stealth-demo-harness/1.0",
       publicKeyRef,
     },
   });

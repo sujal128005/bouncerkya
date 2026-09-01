@@ -1,5 +1,5 @@
 /**
- * Bouncer domain schemas.
+ * STEALTH domain schemas.
  *
  * Grouped by bounded concept rather than one file per entity: a DiffClause is
  * meaningless without its AuthorizationDiff, and a CartItem without its

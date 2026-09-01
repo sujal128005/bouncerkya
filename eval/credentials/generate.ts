@@ -19,8 +19,8 @@
  * worthless. Every case is built from an INTENT chosen first; the artifacts are
  * then derived to match, and the label is read off the intent. The generator
  * never calls `verifyMandate`, never imports the policy, and encodes no copy of
- * Bouncer's rules. So "expected: reject" means "this credential was constructed
- * to be invalid", not "Bouncer said it was invalid". If the two disagree, that
+ * STEALTH's rules. So "expected: reject" means "this credential was constructed
+ * to be invalid", not "STEALTH said it was invalid". If the two disagree, that
  * is a real finding rather than a tautology.
  *
  * Deterministic: the same seed produces byte-identical cases, so a reviewer can

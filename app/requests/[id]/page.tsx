@@ -264,7 +264,7 @@ export default async function RequestDetailPage({ params }: { params: Params }) 
         {/* The last stage draws no rail below it. */}
         <section className="grid grid-cols-[32px_minmax(0,1fr)] gap-x-4">
           <div className="flex flex-col items-center">
-            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-violet-line bg-violet-soft font-mono text-meta font-semibold text-violet tabular-nums">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-rail-line bg-rail-soft font-mono text-meta font-semibold text-rail tabular-nums">
               6
             </span>
           </div>
@@ -273,7 +273,7 @@ export default async function RequestDetailPage({ params }: { params: Params }) 
               <h2 className="font-display text-head font-bold text-ink">
                 Append to the audit chain
               </h2>
-              <span className="flex items-center gap-1.5 font-mono text-label text-violet">
+              <span className="flex items-center gap-1.5 font-mono text-label text-rail">
                 <span aria-hidden className="font-semibold">
                   ✓
                 </span>

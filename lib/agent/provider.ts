@@ -1,6 +1,7 @@
 import { resolveEngineConfig } from "@/lib/ai";
 
 import { createAnthropicAgentClient } from "./anthropic";
+import { setting, settingName, type Setting } from "@/lib/env-vars";
 import type { AgentModelClient } from "./contract";
 import { createOpenAICompatibleAgentClient } from "./openai-compatible";
 
@@ -15,9 +16,8 @@ import { createOpenAICompatibleAgentClient } from "./openai-compatible";
 
 export const DEFAULT_AGENT_MODEL = "claude-haiku-4-5-20251001";
 
-function envValue(name: string): string | undefined {
-  const raw = process.env[name]?.trim();
-  return raw ? raw : undefined;
+function envValue(name: Setting): string | undefined {
+  return setting(name);
 }
 
 export function resolveAgentConfig():
@@ -26,7 +26,7 @@ export function resolveAgentConfig():
   const engine = resolveEngineConfig();
   if (!engine) return null;
 
-  const override = envValue("BOUNCER_AGENT_MODEL");
+  const override = envValue("AGENT_MODEL");
 
   if (engine.provider === "anthropic") {
     return {
@@ -75,12 +75,12 @@ export function createAgentClient(): {
   const config = resolveAgentConfig();
   if (!config) {
     throw new Error(
-      "No model backend configured for the demo agent. Set ANTHROPIC_API_KEY, or BOUNCER_ENGINE_PRESET + BOUNCER_ENGINE_API_KEY.",
+      `No model backend configured for the demo agent. Set ANTHROPIC_API_KEY, or ${settingName("ENGINE_PRESET")} + ${settingName("ENGINE_API_KEY")}.`,
     );
   }
 
   const apiKey =
-    envValue("BOUNCER_ENGINE_API_KEY") ?? envValue("ANTHROPIC_API_KEY") ?? "";
+    envValue("ENGINE_API_KEY") ?? process.env.ANTHROPIC_API_KEY?.trim() ?? "";
 
   if (config.provider === "anthropic") {
     return { client: createAnthropicAgentClient({ apiKey }), model: config.model };

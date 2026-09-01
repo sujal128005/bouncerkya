@@ -54,7 +54,7 @@ const SECRET_PATTERNS: Array<{ name: string; re: RegExp }> = [
   { name: "PEM private key block", re: /-----BEGIN [A-Z ]*PRIVATE KEY-----/ },
   {
     name: "assigned encryption key",
-    re: /BOUNCER_ENCRYPTION_KEY\s*=\s*["'][A-Za-z0-9+/=]{40,}["']/,
+    re: /(?:STEALTH|STEALTH)_ENCRYPTION_KEY\s*=\s*["'][A-Za-z0-9+/=]{40,}["']/,
   },
 ];
 
@@ -82,7 +82,7 @@ const MUST_NOT_BE_TRACKED = [
 
 function main(): void {
   const tracked = trackedFiles();
-  console.log(`Bouncer privacy audit\n${tracked.length} tracked files\n`);
+  console.log(`STEALTH privacy audit\n${tracked.length} tracked files\n`);
 
   // 1. Things that must never be in the repository at all.
   for (const file of tracked) {
@@ -150,7 +150,7 @@ function main(): void {
   const example = fs.existsSync(".env.example")
     ? fs.readFileSync(".env.example", "utf8")
     : "";
-  const assigned = /BOUNCER_ENCRYPTION_KEY\s*=\s*"([^"]+)"/.exec(example);
+  const assigned = /(?:STEALTH|STEALTH)_ENCRYPTION_KEY\s*=\s*"([^"]+)"/.exec(example);
   if (assigned && assigned[1].length > 0) {
     fail(".env.example", "ships a real-looking encryption key; it must be empty");
   }

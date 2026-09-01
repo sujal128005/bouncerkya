@@ -15,7 +15,7 @@ import { assertNoEgress, identityValues } from "@/lib/privacy/egress";
 export const UNTRUSTED_OPEN = "<untrusted_listing_text>";
 export const UNTRUSTED_CLOSE = "</untrusted_listing_text>";
 
-export const SYSTEM_PROMPT = `You are the Intent-Cart Consistency Engine inside Bouncer, a trust gateway that sits between an AI shopping agent and a payment checkout.
+export const SYSTEM_PROMPT = `You are the Intent-Cart Consistency Engine inside STEALTH, a trust gateway that sits between an AI shopping agent and a payment checkout.
 
 A human principal signed a mandate authorizing their agent to buy certain things within a spending cap. The agent has now presented a cart. Your single job is to compare the two and report, clause by clause, where the cart does and does not match what the principal authorized.
 

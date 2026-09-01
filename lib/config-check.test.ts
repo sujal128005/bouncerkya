@@ -8,9 +8,9 @@ const TEST_KEY = "AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8=";
 
 const OK = {
   DATABASE_URL: "file:./prisma/dev.db",
-  BOUNCER_ENCRYPTION_KEY: TEST_KEY,
-  BOUNCER_ENGINE_PRESET: "groq",
-  BOUNCER_ENGINE_API_KEY: "gsk_placeholder",
+  STEALTH_ENCRYPTION_KEY: TEST_KEY,
+  STEALTH_ENGINE_PRESET: "groq",
+  STEALTH_ENGINE_API_KEY: "gsk_placeholder",
   RAZORPAY_KEY_ID: "rzp_test_abc123",
   RAZORPAY_KEY_SECRET: "secret",
 };
@@ -56,14 +56,14 @@ describe("configuration validation", () => {
   });
 
   it("rejects an unknown engine preset", () => {
-    expect(fatalVariables({ ...OK, BOUNCER_ENGINE_PRESET: "gpt5-turbo" })).toContain(
-      "BOUNCER_ENGINE_PRESET",
+    expect(fatalVariables({ ...OK, STEALTH_ENGINE_PRESET: "gpt5-turbo" })).toContain(
+      "STEALTH_ENGINE_PRESET",
     );
   });
 
   it("rejects a preset configured without an API key", () => {
-    expect(fatalVariables({ ...OK, BOUNCER_ENGINE_API_KEY: undefined })).toContain(
-      "BOUNCER_ENGINE_API_KEY",
+    expect(fatalVariables({ ...OK, STEALTH_ENGINE_API_KEY: undefined })).toContain(
+      "STEALTH_ENGINE_API_KEY",
     );
   });
 
@@ -73,7 +73,7 @@ describe("configuration validation", () => {
     // plaintext would still describe itself as encrypted.
     const minimal = {
       DATABASE_URL: "file:./prisma/dev.db",
-      BOUNCER_ENCRYPTION_KEY: TEST_KEY,
+      STEALTH_ENCRYPTION_KEY: TEST_KEY,
     };
     expect(fatalVariables(minimal)).toEqual([]);
     expect(() => assertConfiguration(minimal)).not.toThrow();
@@ -81,7 +81,7 @@ describe("configuration validation", () => {
     // ...but it does say what will degrade.
     const warnings = checkConfiguration(minimal).filter((p) => p.severity === "warning");
     expect(warnings.map((w) => w.variable)).toEqual(
-      expect.arrayContaining(["BOUNCER_ENGINE_API_KEY", "RAZORPAY_KEY_ID"]),
+      expect.arrayContaining(["STEALTH_ENGINE_API_KEY", "RAZORPAY_KEY_ID"]),
     );
   });
 
@@ -99,10 +99,10 @@ describe("the encryption key", () => {
   it("is fatal when missing, with no plaintext fallback", () => {
     const problems = checkConfiguration({
       ...OK,
-      BOUNCER_ENCRYPTION_KEY: undefined,
+      STEALTH_ENCRYPTION_KEY: undefined,
     });
     const problem = problems.find(
-      (p) => p.variable === "BOUNCER_ENCRYPTION_KEY",
+      (p) => p.variable === "STEALTH_ENCRYPTION_KEY",
     );
     expect(problem?.severity).toBe("fatal");
     expect(problem?.detail).toContain("will not fall back to plaintext");
@@ -112,10 +112,10 @@ describe("the encryption key", () => {
     const short = "c2hvcnRrZXk=";
     const problems = checkConfiguration({
       ...OK,
-      BOUNCER_ENCRYPTION_KEY: short,
+      STEALTH_ENCRYPTION_KEY: short,
     });
     const problem = problems.find(
-      (p) => p.variable === "BOUNCER_ENCRYPTION_KEY",
+      (p) => p.variable === "STEALTH_ENCRYPTION_KEY",
     );
     expect(problem?.severity).toBe("fatal");
     expect(problem?.detail).toContain("bytes");
@@ -124,7 +124,7 @@ describe("the encryption key", () => {
 
   it("accepts a correct 32-byte key", () => {
     const problems = checkConfiguration(OK).filter(
-      (p) => p.variable === "BOUNCER_ENCRYPTION_KEY",
+      (p) => p.variable === "STEALTH_ENCRYPTION_KEY",
     );
     expect(problems).toEqual([]);
   });
@@ -140,21 +140,21 @@ describe("the encryption key", () => {
 describe("two variables on one line", () => {
   const MERGED = {
     ...OK,
-    BOUNCER_ENGINE_PRESET: 'gemini" BOUNCER_ENGINE_API_KEY="AQ.Ab8RN6K',
-    BOUNCER_ENGINE_API_KEY: undefined,
+    STEALTH_ENGINE_PRESET: 'gemini" STEALTH_ENGINE_API_KEY="AQ.Ab8RN6K',
+    STEALTH_ENGINE_API_KEY: undefined,
   };
 
   it("is fatal, and names the variable that got swallowed", () => {
     const problem = checkConfiguration(MERGED).find(
-      (p) => p.variable === "BOUNCER_ENGINE_PRESET" && p.detail.includes("one line"),
+      (p) => p.variable === "STEALTH_ENGINE_PRESET" && p.detail.includes("one line"),
     );
     expect(problem?.severity).toBe("fatal");
-    expect(problem?.detail).toContain("BOUNCER_ENGINE_API_KEY");
+    expect(problem?.detail).toContain("STEALTH_ENGINE_API_KEY");
   });
 
   it("is reported before the unknown-preset complaint it causes", () => {
     const details = checkConfiguration(MERGED)
-      .filter((p) => p.variable === "BOUNCER_ENGINE_PRESET")
+      .filter((p) => p.variable === "STEALTH_ENGINE_PRESET")
       .map((p) => p.detail);
     const merged = details.findIndex((d) => d.includes("one line"));
     const unknown = details.findIndex((d) => d.includes("Unknown preset"));
@@ -174,8 +174,71 @@ describe("two variables on one line", () => {
     const problems = checkConfiguration({
       ...OK,
       DATABASE_URL: "file:./prisma/dev.db?connection_limit=1",
-      BOUNCER_ENGINE_API_KEY: "gsk_abc==",
+      STEALTH_ENGINE_API_KEY: "gsk_abc==",
     }).filter((p) => p.detail.includes("one line"));
+    expect(problems).toEqual([]);
+  });
+});
+
+/*
+ * The rename from Bouncer to STEALTH must not quietly unconfigure anyone. A
+ * .env written before it keeps its BOUNCER_ names, and the database it unlocks
+ * is already encrypted under that key's value. A checker that reported those
+ * variables as missing would send someone to generate a new key and lose the
+ * data the old one opens.
+ */
+describe("a .env written before the rename", () => {
+  const LEGACY = {
+    DATABASE_URL: "file:./prisma/dev.db",
+    BOUNCER_ENCRYPTION_KEY: TEST_KEY,
+    BOUNCER_ENGINE_PRESET: "groq",
+    BOUNCER_ENGINE_API_KEY: "gsk_placeholder",
+    RAZORPAY_KEY_ID: "rzp_test_abc123",
+    RAZORPAY_KEY_SECRET: "secret",
+  };
+
+  it("is still a fully configured environment", () => {
+    expect(fatalVariables(LEGACY)).toEqual([]);
+    expect(() => assertConfiguration(LEGACY)).not.toThrow();
+  });
+
+  it("does not warn that the model backend is missing", () => {
+    const warnings = checkConfiguration(LEGACY)
+      .filter((p) => p.severity === "warning")
+      .map((p) => p.detail);
+    expect(warnings.join(" ")).not.toContain("No model backend");
+  });
+
+  it("still catches a bad preset, and names the spelling in their file", () => {
+    const problem = checkConfiguration({
+      ...LEGACY,
+      BOUNCER_ENGINE_PRESET: "gpt5-turbo",
+    }).find((p) => p.detail.includes("Unknown preset"));
+    expect(problem?.variable).toBe("BOUNCER_ENGINE_PRESET");
+  });
+
+  it("still catches a wrong-length key, and names the spelling in their file", () => {
+    const problem = checkConfiguration({
+      ...LEGACY,
+      BOUNCER_ENCRYPTION_KEY: Buffer.alloc(16).toString("base64"),
+    }).find((p) => p.detail.includes("bytes"));
+    expect(problem?.variable).toBe("BOUNCER_ENCRYPTION_KEY");
+  });
+
+  it("still catches two variables on one line under the old names", () => {
+    const problem = checkConfiguration({
+      ...LEGACY,
+      BOUNCER_ENGINE_PRESET: 'gemini" BOUNCER_ENGINE_API_KEY="AQ.x',
+    }).find((p) => p.detail.includes("one line"));
+    expect(problem?.severity).toBe("fatal");
+  });
+
+  it("prefers the new name when a file carries both", () => {
+    const problems = checkConfiguration({
+      ...LEGACY,
+      STEALTH_ENGINE_PRESET: "groq",
+      BOUNCER_ENGINE_PRESET: "not-a-preset",
+    }).filter((p) => p.detail.includes("Unknown preset"));
     expect(problems).toEqual([]);
   });
 });

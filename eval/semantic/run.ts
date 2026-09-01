@@ -20,6 +20,7 @@
  */
 
 import "../../lib/load-env";
+import { setting } from "../../lib/env-vars";
 
 import fs from "node:fs";
 import path from "node:path";
@@ -52,7 +53,7 @@ import {
 } from "./generate";
 
 const AGENT_ID = "agt_eval_01";
-const KEY_REF = "kms://bouncer/agent-keys/eval-01";
+const KEY_REF = "kms://stealth/agent-keys/eval-01";
 const CHECKPOINT = path.join(process.cwd(), "eval", "semantic", ".checkpoint.jsonl");
 
 /**
@@ -68,7 +69,7 @@ const CHECKPOINT = path.join(process.cwd(), "eval", "semantic", ".checkpoint.jso
  * cases keeps the run under the limit instead of repeatedly crashing into it.
  * Slower per case, dramatically faster to a complete result.
  */
-const GAP_MS = Number(process.env.BOUNCER_EVAL_GAP_MS ?? 6_000);
+const GAP_MS = Number(setting("EVAL_GAP_MS") ?? 6_000);
 
 /**
  * Circuit breaker.
@@ -83,7 +84,7 @@ const GAP_MS = Number(process.env.BOUNCER_EVAL_GAP_MS ?? 6_000);
  * actually measured. Partial honest data beats eight hours of outage.
  */
 const CONSECUTIVE_FAILURE_LIMIT = Number(
-  process.env.BOUNCER_EVAL_FAILURE_LIMIT ?? 8,
+  setting("EVAL_FAILURE_LIMIT") ?? 8,
 );
 
 const sleep = (ms: number) =>
@@ -199,7 +200,7 @@ async function main(): Promise<void> {
   if (!stub && !isEngineConfigured()) {
     console.error(
       "No model backend configured, so there is nothing to measure.\n" +
-        "Set ANTHROPIC_API_KEY, or BOUNCER_ENGINE_PRESET + BOUNCER_ENGINE_API_KEY.\n" +
+        "Set ANTHROPIC_API_KEY, or STEALTH_ENGINE_PRESET + STEALTH_ENGINE_API_KEY.\n" +
         "Use --stub to check the harness without a model (produces no metrics).",
     );
     process.exitCode = 1;

@@ -33,11 +33,11 @@ export default async function InboxPage() {
       <div className="relative flex flex-wrap items-end justify-between gap-4 border-b border-line pb-4">
         <div>
           <h1 className="font-display flex items-center gap-2.5 text-page font-bold text-ink">
-            <IconHuman className="h-6 w-6 text-violet" />
+            <IconHuman className="h-6 w-6 text-rail" />
             Approvals
           </h1>
           <p className="mt-2 max-w-[70ch] text-body leading-[1.6] text-ink-2">
-            Checkouts Bouncer would not decide on its own. Each one is here
+            Checkouts STEALTH would not decide on its own. Each one is here
             because the diff was inconclusive, or because the engine could not
             produce one at all, and an absent judgement escalates rather
             than allowing. Answering writes to the database and appends to the
@@ -46,7 +46,7 @@ export default async function InboxPage() {
         </div>
         <div
           aria-hidden
-          className="absolute bottom-[-1px] left-0 h-[2px] w-24 bg-violet"
+          className="absolute bottom-[-1px] left-0 h-[2px] w-24 bg-rail"
         />
         <div className="flex items-baseline gap-2">
           <span className="label-caps">Pending</span>
@@ -63,7 +63,7 @@ export default async function InboxPage() {
               No requests awaiting approval
             </h2>
             <p className="mt-2 max-w-[68ch] text-body leading-[1.55] text-ink-2">
-              Bouncer escalates a checkout only when it can neither allow nor
+              STEALTH escalates a checkout only when it can neither allow nor
               decline on its own. Either the diff was inconclusive, or the engine
               could not produce one at all. No request currently meets that
               condition.
@@ -107,7 +107,7 @@ export default async function InboxPage() {
                 clauseSummary={
                   diff
                     ? diff.clauses.map((clause) => clause.explanation).join(" ")
-                    : "No Authorization Diff exists for this request, so there is no clause-by-clause evidence to review. Bouncer escalates when the engine cannot produce one. A missing judgement is never treated as permission."
+                    : "No Authorization Diff exists for this request, so there is no clause-by-clause evidence to review. STEALTH escalates when the engine cannot produce one. A missing judgement is never treated as permission."
                 }
                 requestedAt={formatTimestamp(
                   scenario.purchaseRequest.requestedAt,

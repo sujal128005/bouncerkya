@@ -8,7 +8,7 @@
  * Everything else about the Razorpay integration is proven: unit tests cover
  * webhook signature verification and live-key refusal, and the database
  * enforces idempotency. What was never proven is the only thing that actually
- * matters to the product's one-line claim — that Bouncer can create a real
+ * matters to the product's one-line claim — that STEALTH can create a real
  * order against Razorpay's real test-mode API.
  *
  * That gap cannot be closed by reading code, by a mock, or by a unit test. It
@@ -43,7 +43,7 @@ async function main(): Promise<void> {
   const keyId = process.env.RAZORPAY_KEY_ID?.trim();
   const keySecret = process.env.RAZORPAY_KEY_SECRET?.trim();
 
-  console.log("Bouncer — Razorpay test-mode verification\n");
+  console.log("STEALTH — Razorpay test-mode verification\n");
 
   if (!keyId || !keySecret) {
     console.error(
@@ -70,7 +70,7 @@ async function main(): Promise<void> {
   // A deliberately odd amount, so the order is unmistakable in the dashboard
   // and cannot be confused with a seeded demo figure.
   const amountMinor = 100_101; // INR 1,001.01
-  const receipt = `bouncer_verify_${Date.now().toString(36)}`;
+  const receipt = `stealth_verify_${Date.now().toString(36)}`;
 
   console.log(`amount      INR ${(amountMinor / 100).toFixed(2)} (${amountMinor} paise)`);
   console.log(`receipt     ${receipt}\n`);
@@ -84,7 +84,7 @@ async function main(): Promise<void> {
       currency: "INR",
       receipt,
       notes: {
-        purpose: "bouncer integration verification",
+        purpose: "stealth integration verification",
         note: "Not a pipeline decision. Created by npm run razorpay:verify.",
       },
     });

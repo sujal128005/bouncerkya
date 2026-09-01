@@ -5,7 +5,7 @@ import Link from "next/link";
  *
  * It carries the one sentence that explains the whole product, plus an honest
  * statement of what this deployment actually is. A judge landing on the console
- * cold should be able to look down and learn three things: what Bouncer does,
+ * cold should be able to look down and learn three things: what STEALTH does,
  * that the model recommends rather than decides, and that Razorpay is in test
  * mode with no real money involved.
  *
@@ -19,7 +19,7 @@ export function SiteFooter() {
         <div className="grid grid-cols-1 gap-8 md:grid-cols-[minmax(0,2fr)_minmax(0,1fr)_minmax(0,1fr)]">
           <div>
             <div className="font-mono text-body font-semibold tracking-[0.16em] text-ink">
-              BOUNCER
+              STEALTH
             </div>
             <p className="mt-2 max-w-[52ch] text-body leading-[1.6] text-ink-2">
               A trust gateway between an AI shopping agent and checkout. It
@@ -83,14 +83,14 @@ export function SiteFooter() {
           </p>
 
           <a
-            href="https://sujalnegi.tech"
+            href="https://linkedin.com/in/navya-made-7236b633a/"
             target="_blank"
             rel="noreferrer noopener"
             className="group inline-flex shrink-0 items-baseline gap-1.5 text-label whitespace-nowrap text-ink-3 transition-colors hover:text-ink-2"
           >
             Made by
-            <span className="bg-gradient-to-r from-accent-strong via-violet to-cyan bg-clip-text font-medium text-transparent">
-              Sujal Negi
+            <span className="bg-gradient-to-r from-accent-strong via-rail to-measure bg-clip-text font-medium text-transparent">
+              Made Navya
             </span>
             <span
               aria-hidden
@@ -98,10 +98,13 @@ export function SiteFooter() {
             >
               &#8599;
             </span>
-            <span className="sr-only">(opens sujalnegi.tech in a new tab)</span>
+            <span className="sr-only">(opens LinkedIn in a new tab)</span>
           </a>
         </div>
       </div>
     </footer>
   );
 }
+
+
+

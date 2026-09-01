@@ -1,7 +1,7 @@
 import { z } from "zod";
 import { Id, Timestamp } from "./primitives";
 
-/** The only three things Bouncer may do with a checkout attempt. */
+/** The only three things STEALTH may do with a checkout attempt. */
 export const PolicyOutcome = z.enum(["ALLOW", "STEP_UP", "DECLINE"]);
 
 export const PolicyDecision = z.object({

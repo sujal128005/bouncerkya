@@ -1,4 +1,5 @@
 import crypto from "node:crypto";
+import { setting, settingName } from "@/lib/env-vars";
 
 /**
  * Field-level encryption at rest.
@@ -35,18 +36,28 @@ import crypto from "node:crypto";
  *
  * FORMAT
  *
- *   bnc1.<iv>.<tag>.<ciphertext>      all base64url, no padding
+ *   stl1.<iv>.<tag>.<ciphertext>      all base64url, no padding
  *
- * The version prefix exists so a future key rotation can re-encrypt in place
- * and still read what the previous scheme wrote.
+ * The version prefix exists so a change of scheme can re-encrypt in place and
+ * still read what the previous one wrote. The rename from Bouncer to STEALTH
+ * is the first time that mattered: new values are written as `stl1`, and
+ * `bnc1` rows already in the database stay readable.
+ *
+ * The prefix is part of the AAD, so it is NOT cosmetic. Reading an old row
+ * requires authenticating it under the version it was written with, which is
+ * why the version is parsed from the blob rather than assumed.
  */
 
-const VERSION = "bnc1";
+/** What new values are written as. */
+const VERSION = "stl1";
+
+/** What can be read. Newest first; every entry must stay readable forever. */
+export const ACCEPTED_VERSIONS = ["stl1", "bnc1"] as const;
 const ALGORITHM = "aes-256-gcm";
 const IV_BYTES = 12; // 96 bits, the size AES-GCM is specified for
 const TAG_BYTES = 16;
 const KEY_BYTES = 32; // AES-256
-export const ENCRYPTION_KEY_ENV = "BOUNCER_ENCRYPTION_KEY";
+export const ENCRYPTION_KEY_ENV = settingName("ENCRYPTION_KEY");
 
 function b64url(buffer: Buffer): string {
   return buffer.toString("base64url");
@@ -69,7 +80,11 @@ export type EnvLike = Record<string, string | undefined>;
  * checking a length is not a cost worth caching against.
  */
 export function readEncryptionKey(env: EnvLike = process.env): Buffer {
-  const raw = env[ENCRYPTION_KEY_ENV]?.trim();
+  // Accepts the pre-rename BOUNCER_ENCRYPTION_KEY too. A .env written before
+  // the rename must keep working: silently finding no key here would look
+  // exactly like never having set one, and the database it unlocks is already
+  // encrypted under it.
+  const raw = setting("ENCRYPTION_KEY", env);
   if (!raw) {
     throw new Error(
       `${ENCRYPTION_KEY_ENV} is not set, so encrypted fields cannot be read or written. ` +
@@ -107,16 +122,34 @@ export function encryptionConfigured(env: EnvLike = process.env): boolean {
 /**
  * The binding between a ciphertext and its home.
  *
- * `model.field.id` and nothing else. Including a timestamp would break
+ * `version.model.field.id` and nothing else. Including a timestamp would break
  * re-reads; including the plaintext would defeat the purpose.
+ *
+ * The version is a parameter because it is inside the AAD. A row written as
+ * `bnc1` only authenticates against an AAD that begins `bnc1`, so a reader must
+ * pass the version it found in the blob rather than the one it would write.
  */
-export function fieldAad(model: string, field: string, id: string): Buffer {
-  return Buffer.from(`${VERSION}.${model}.${field}.${id}`, "utf8");
+export function fieldAad(
+  model: string,
+  field: string,
+  id: string,
+  version: string = VERSION,
+): Buffer {
+  return Buffer.from(`${version}.${model}.${field}.${id}`, "utf8");
+}
+
+/** The scheme a stored value was written under, or null if it is not one of ours. */
+export function blobVersion(value: string): string | null {
+  const parts = value.split(".");
+  if (parts.length !== 4) return null;
+  return (ACCEPTED_VERSIONS as readonly string[]).includes(parts[0])
+    ? parts[0]
+    : null;
 }
 
 /** True for a value this module produced. Used to keep re-encryption idempotent. */
 export function isEncrypted(value: string): boolean {
-  return value.startsWith(`${VERSION}.`) && value.split(".").length === 4;
+  return blobVersion(value) !== null;
 }
 
 export function encryptField(
@@ -148,9 +181,9 @@ export function decryptField(
   key: Buffer = readEncryptionKey(),
 ): string {
   const parts = blob.split(".");
-  if (parts.length !== 4 || parts[0] !== VERSION) {
+  if (blobVersion(blob) === null) {
     throw new DecryptionError(
-      `unrecognised format (expected ${VERSION} with four segments)`,
+      `unrecognised format (expected one of ${ACCEPTED_VERSIONS.join(", ")} with four segments)`,
     );
   }
 

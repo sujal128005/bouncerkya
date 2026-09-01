@@ -59,7 +59,7 @@ export function removeTempDatabase(
 }
 
 export function createTempDatabase(): { file: string; cleanup: () => void } {
-  const file = path.join(os.tmpdir(), `bouncer-test-${randomUUID()}.db`);
+  const file = path.join(os.tmpdir(), `stealth-test-${randomUUID()}.db`);
   const migrationsDir = path.resolve(process.cwd(), "prisma", "migrations");
 
   const db = new Database(file);

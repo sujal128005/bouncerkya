@@ -17,7 +17,7 @@ import {
 } from "./verify";
 
 const AGENT_ID = "agt_vega_01";
-const KEY_REF = "kms://bouncer/agent-keys/vega-01";
+const KEY_REF = "kms://stealth/agent-keys/vega-01";
 const NOW = new Date("2026-08-25T10:00:00.000Z");
 
 const keyPair = generateAgentKeyPair();
@@ -223,7 +223,7 @@ describe("keystore", () => {
   });
 
   it("returns null for an unknown or corrupt key reference", () => {
-    expect(resolvePublicKey(keystore, "kms://bouncer/agent-keys/nope")).toBeNull();
+    expect(resolvePublicKey(keystore, "kms://stealth/agent-keys/nope")).toBeNull();
     expect(resolvePublicKey({ bad: "not-a-key" }, "bad")).toBeNull();
   });
 });

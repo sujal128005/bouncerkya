@@ -32,7 +32,7 @@ export const MODEL_BOUNDARY: Control = {
   id: "model-boundary",
   title: "Identity never reaches the model provider",
   headline:
-    "Bouncer judges a cart with a large language model running at a third party. The cart goes. The shopper does not.",
+    "STEALTH judges a cart with a large language model running at a third party. The cart goes. The shopper does not.",
   how: "The prompt is assembled from a narrow evidence object and then checked, at runtime, against the identity values belonging to that checkout. If any of them appear in the outbound string the call is abandoned before the HTTP request is made. Because an engine that cannot answer produces STEP_UP and never ALLOW, a privacy regression degrades into a human approval rather than a leak.",
   protects:
     "The provider receives authorized categories, the spend cap and currency, the cart's line names, quantities and prices, the listing ids, and the untrusted listing text. It does not receive the principal's name or id, the mandate id, the purchase request id, the agent id, the mandate nonce, the signature, or the merchant account id. It is given a shopping basket with no way to know whose it is.",
@@ -47,7 +47,7 @@ export const ENCRYPTION_AT_REST: Control = {
   id: "at-rest",
   title: "Four columns are encrypted in the database",
   headline:
-    "Someone who steals the database file learns that a purchase happened, for how much, and what Bouncer decided. They do not learn whose it was or what was in the basket.",
+    "Someone who steals the database file learns that a purchase happened, for how much, and what STEALTH decided. They do not learn whose it was or what was in the basket.",
   how: "AES-256-GCM with a fresh 96-bit IV per value. Each ciphertext is additionally bound to the exact model, field and row id it belongs to through the AAD, so a ciphertext that is MOVED between rows fails to authenticate rather than decrypting cleanly into the wrong place. The encrypted columns are the principal's display name, every cart line name, the session's free text, and the session's structured fields, which carry the merchant account id.",
   protects:
     "An attacker who obtains the database file and not the key. That is the commonest case by a wide margin: backups, snapshots, object storage left open, a laptop, a support export, a repository someone committed the database into. In every one of those the file travels and the process environment does not.",
@@ -120,7 +120,7 @@ export const ABSENT: Array<{ what: string; why: string }> = [
   },
   {
     what: "Anything about the model provider's own handling",
-    why: "The cart contents that are legitimately sent are subject to whatever the provider does with them. Bouncer controls what leaves; it controls nothing after that.",
+    why: "The cart contents that are legitimately sent are subject to whatever the provider does with them. STEALTH controls what leaves; it controls nothing after that.",
   },
 ];
 

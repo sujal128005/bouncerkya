@@ -1,4 +1,4 @@
-// Bouncer — persistence model.
+// STEALTH — persistence model.
 //
 // This mirrors /schemas (Zod) as closely as SQLite allows. Three storage-level
 // differences are unavoidable and are documented inline:

@@ -30,13 +30,13 @@ const STATE_MARK: Record<StageState, string> = {
 };
 
 /*
- * A stage that ran takes the violet decorative hue, a stage that never ran is
+ * A stage that ran takes the rail decorative hue, a stage that never ran is
  * left grey, and a stage that FAILED takes the decline colour -- the one
  * functional colour on this rail, and it is functional because a failed stage
  * is exactly what a DECLINE is made of.
  */
 const STATE_RING: Record<StageState, string> = {
-  ran: "border-violet-line bg-violet-soft text-violet",
+  ran: "border-rail-line bg-rail-soft text-rail",
   skipped: "border-line bg-inset text-ink-3",
   failed: "border-decline-line bg-decline-soft text-decline",
 };
@@ -64,7 +64,7 @@ export function StageSection({
         >
           {n}
         </span>
-        <span aria-hidden className="mt-1 w-px flex-1 bg-gradient-to-b from-violet-line to-line" />
+        <span aria-hidden className="mt-1 w-px flex-1 bg-gradient-to-b from-rail-line to-line" />
       </div>
 
       <div className="pb-8">

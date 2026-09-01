@@ -1,7 +1,7 @@
 /**
  * Configuration validation.
  *
- * The point is NOT to demand every environment variable. Most of Bouncer
+ * The point is NOT to demand every environment variable. Most of STEALTH
  * degrades deliberately: with no model backend the console still renders and
  * says the engine was not called; with no Razorpay keys an ALLOW records the
  * decision and reports that no order could be created. Refusing to boot for a
@@ -20,6 +20,8 @@
  * shape it should have, never what it currently contains.
  */
 
+import { SETTINGS, bothNames, setting, settingName, settingSource } from "./env-vars";
+
 export type ConfigProblem = {
   variable: string;
   severity: "fatal" | "warning";
@@ -31,24 +33,24 @@ const KNOWN_PRESETS = ["groq", "xai", "openrouter", "gemini"];
 /** AES-256. A key of any other length is a misconfiguration, not a weaker key. */
 const ENCRYPTION_KEY_BYTES = 32;
 
-/** Every variable this project reads, so one loop can sanity-check them all. */
+/**
+ * Every variable this project reads, so one loop can sanity-check them all.
+ * Both spellings of our own settings are listed: a .env written before the
+ * rename is still valid, and a merged line in it must still be caught.
+ */
 const OWN_VARIABLES = [
   "DATABASE_URL",
   "RAZORPAY_KEY_ID",
   "RAZORPAY_KEY_SECRET",
-  "BOUNCER_ENGINE_PRESET",
-  "BOUNCER_ENGINE_API_KEY",
-  "BOUNCER_ENGINE_BASE_URL",
-  "BOUNCER_ENGINE_MODEL",
-  "BOUNCER_ENCRYPTION_KEY",
   "ANTHROPIC_API_KEY",
+  ...SETTINGS.flatMap((name) => bothNames(name)),
 ];
 
 /**
  * Catches the single easiest mistake to make in a .env file: putting two
  * assignments on one line.
  *
- *   BOUNCER_ENGINE_PRESET="gemini" BOUNCER_ENGINE_API_KEY="AQ..."
+ *   STEALTH_ENGINE_PRESET="gemini" STEALTH_ENGINE_API_KEY="AQ..."
  *
  * dotenv does not complain. It gives the first variable a value containing the
  * second variable's name, and never defines the second at all. Every downstream
@@ -110,7 +112,7 @@ export function checkConfiguration(
       variable: "RAZORPAY_KEY_ID",
       severity: "fatal",
       detail:
-        "Must be a TEST-mode key beginning with rzp_test_. Bouncer refuses live-mode keys, because an ALLOW creates a real order.",
+        "Must be a TEST-mode key beginning with rzp_test_. STEALTH refuses live-mode keys, because an ALLOW creates a real order.",
     });
   }
   if (keyId && !value("RAZORPAY_KEY_SECRET")) {
@@ -121,17 +123,19 @@ export function checkConfiguration(
     });
   }
 
-  const preset = value("BOUNCER_ENGINE_PRESET");
+  const preset = setting("ENGINE_PRESET", env);
   if (preset && !KNOWN_PRESETS.includes(preset)) {
     problems.push({
-      variable: "BOUNCER_ENGINE_PRESET",
+      // Name the spelling actually present in their file, not the one we
+      // would prefer they used. They have to find the line to fix it.
+      variable: settingSource("ENGINE_PRESET", env) ?? settingName("ENGINE_PRESET"),
       severity: "fatal",
       detail: `Unknown preset. Expected one of: ${KNOWN_PRESETS.join(", ")}.`,
     });
   }
-  if (preset && !value("BOUNCER_ENGINE_API_KEY")) {
+  if (preset && !setting("ENGINE_API_KEY", env)) {
     problems.push({
-      variable: "BOUNCER_ENGINE_API_KEY",
+      variable: settingName("ENGINE_API_KEY"),
       severity: "fatal",
       detail:
         "A preset is configured but no API key is set, so every model call would fail at request time.",
@@ -148,19 +152,19 @@ export function checkConfiguration(
    * describe itself as encrypted on /privacy, which is the exact shape of a
    * privacy claim that is not true. So a missing or malformed key is fatal.
    */
-  const encryptionKey = value("BOUNCER_ENCRYPTION_KEY");
+  const encryptionKey = setting("ENCRYPTION_KEY", env);
   if (!encryptionKey) {
     problems.push({
-      variable: "BOUNCER_ENCRYPTION_KEY",
+      variable: settingName("ENCRYPTION_KEY"),
       severity: "fatal",
       detail:
-        "Not set. Four columns are stored encrypted and cannot be read or written without it. Generate one with `npm run privacy:keygen` and add it to .env. Bouncer will not fall back to plaintext.",
+        "Not set. Four columns are stored encrypted and cannot be read or written without it. Generate one with `npm run privacy:keygen` and add it to .env. STEALTH will not fall back to plaintext.",
     });
   } else {
     const decoded = Buffer.from(encryptionKey, "base64");
     if (decoded.length !== ENCRYPTION_KEY_BYTES) {
       problems.push({
-        variable: "BOUNCER_ENCRYPTION_KEY",
+        variable: settingSource("ENCRYPTION_KEY", env) ?? settingName("ENCRYPTION_KEY"),
         severity: "fatal",
         // The length is safe to report. The value never is.
         detail: `Decodes to ${decoded.length} bytes; AES-256 needs ${ENCRYPTION_KEY_BYTES}. Generate a correct one with \`npm run privacy:keygen\`.`,
@@ -169,9 +173,9 @@ export function checkConfiguration(
   }
 
   // Degradations worth announcing, but never worth refusing to boot for.
-  if (!value("ANTHROPIC_API_KEY") && !preset && !value("BOUNCER_ENGINE_BASE_URL")) {
+  if (!value("ANTHROPIC_API_KEY") && !preset && !setting("ENGINE_BASE_URL", env)) {
     problems.push({
-      variable: "BOUNCER_ENGINE_API_KEY",
+      variable: settingName("ENGINE_API_KEY"),
       severity: "warning",
       detail:
         "No model backend. The Intent-Cart Engine will not be called; requests that reach it escalate to a human instead of being allowed.",
@@ -208,13 +212,13 @@ export function assertConfiguration(
 
   if (warnings.length > 0) {
     console.warn(
-      `[bouncer] configuration notes:\n${formatConfigProblems(warnings)}`,
+      `[stealth] configuration notes:\n${formatConfigProblems(warnings)}`,
     );
   }
 
   if (fatal.length > 0) {
     throw new Error(
-      `Bouncer cannot start. Configuration is present but invalid:\n${formatConfigProblems(fatal)}`,
+      `STEALTH cannot start. Configuration is present but invalid:\n${formatConfigProblems(fatal)}`,
     );
   }
 }

@@ -3,7 +3,7 @@ import type { AuthorizationDiff, DiffClauseSeverity, PolicyOutcome } from "@/sch
 /**
  * The deterministic threshold policy.
  *
- * This is the only place in Bouncer that turns evidence into a verdict, and it
+ * This is the only place in STEALTH that turns evidence into a verdict, and it
  * is deliberately dumb: no model, no network, no I/O, no clock. Given the same
  * AuthorizationDiff it returns the same outcome forever, which is what makes a
  * decision defensible after the fact.

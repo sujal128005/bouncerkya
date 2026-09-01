@@ -3,7 +3,7 @@
  *
  * THE PROBLEM THIS EXISTS FOR
  *
- * Bouncer judges a cart with a large language model, and that model runs at a
+ * STEALTH judges a cart with a large language model, and that model runs at a
  * third party: Groq, Google, Anthropic, OpenRouter. Every byte of the prompt
  * leaves this machine, crosses the public internet, and lands in somebody
  * else's logs, retention window and jurisdiction.

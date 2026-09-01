@@ -16,7 +16,7 @@
  *   singleFlight  "is one already running?"      -> 409, immediately
  *   rateLimit     "have too many run recently?"  -> 429, with a retry hint
  *
- * DELIBERATELY IN-MEMORY. Bouncer is a single-instance demo console; a Redis
+ * DELIBERATELY IN-MEMORY. STEALTH is a single-instance demo console; a Redis
  * dependency would be infrastructure added for its own sake. The honest
  * limitations are that the counters reset when the server restarts and would
  * not be shared across instances. Both are stated here rather than discovered

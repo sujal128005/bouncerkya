@@ -23,16 +23,16 @@ import {
  */
 
 export const metadata = {
-  title: "Privacy · Bouncer",
+  title: "Privacy · STEALTH",
   description:
-    "The three privacy controls in Bouncer, each with what it protects against and what it does not.",
+    "The three privacy controls in STEALTH, each with what it protects against and what it does not.",
 };
 
 const TONES = [
   "border-t-accent",
-  "border-t-cyan",
-  "border-t-violet",
-  "border-t-fuchsia",
+  "border-t-measure",
+  "border-t-rail",
+  "border-t-evidence",
 ] as const;
 
 function ControlCard({ control, index }: { control: Control; index: number }) {
@@ -41,7 +41,7 @@ function ControlCard({ control, index }: { control: Control; index: number }) {
       <PanelHeader
         title={control.title}
         meta={
-          <code className="rounded-control border border-cyan-line bg-cyan-soft px-2 py-[2px] font-mono text-label text-cyan">
+          <code className="rounded-control border border-measure-line bg-measure-soft px-2 py-[2px] font-mono text-label text-measure">
             {control.tests}
           </code>
         }
@@ -89,7 +89,7 @@ export default function PrivacyPage() {
     <main className="mx-auto flex max-w-[1100px] flex-col px-6 pt-8 pb-10">
       <div className="relative border-b border-line pb-6">
         <h1 className="font-display flex items-center gap-2.5 text-page font-bold text-ink">
-          <IconMandate className="h-6 w-6 text-violet" />
+          <IconMandate className="h-6 w-6 text-rail" />
           Privacy
         </h1>
         <p className="mt-3 max-w-[80ch] text-body leading-[1.7] text-ink-2">
@@ -97,12 +97,12 @@ export default function PrivacyPage() {
         </p>
         <div
           aria-hidden
-          className="absolute bottom-[-1px] left-0 h-[2px] w-24 bg-violet"
+          className="absolute bottom-[-1px] left-0 h-[2px] w-24 bg-rail"
         />
       </div>
 
       {/* ------------------------------------------------------- the claim */}
-      <section className="band-violet -mx-6 mt-6 rounded-panel px-6 py-6">
+      <section className="band-rail -mx-6 mt-6 rounded-panel px-6 py-6">
         <h2 className="font-display text-head font-bold text-ink">
           The exposure nobody writes about
         </h2>
@@ -117,7 +117,7 @@ export default function PrivacyPage() {
         <p className="mt-3 max-w-[84ch] text-body leading-[1.7] text-ink-2">
           The usual answer is to hand the model the whole request object,
           because it is easier, and the shopper&rsquo;s name and account id go
-          with it. Bouncer sends the basket and withholds the identity, and
+          with it. STEALTH sends the basket and withholds the identity, and
           enforces that at runtime rather than trusting itself to remember.
         </p>
       </section>
@@ -132,7 +132,7 @@ export default function PrivacyPage() {
       {/* -------------------------------------------------------- the gaps */}
       <section className="mt-10">
         <h2 className="font-display flex items-center gap-2 text-head font-bold text-ink">
-          <IconChain className="h-5 w-5 text-fuchsia" />
+          <IconChain className="h-5 w-5 text-evidence" />
           Designed, and not built
         </h2>
         <p className="mt-2 max-w-[84ch] text-body leading-[1.65] text-ink-2">
@@ -179,7 +179,7 @@ grep -c "Aarav Menon" prisma/dev.db     # 0
 grep -c "bnc1." prisma/dev.db           # every sealed value`}
         </pre>
         <p className="mt-4 max-w-[84ch] text-meta leading-[1.6] text-ink-3">
-          The encryption key is required. Bouncer refuses to start without it
+          The encryption key is required. STEALTH refuses to start without it
           rather than falling back to plaintext, because a deployment that
           silently stored plaintext would still render, still decide correctly,
           and still describe itself as encrypted on this page.

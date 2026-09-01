@@ -216,7 +216,7 @@ export const RAZORPAY_VERIFICATION: Verification[] = [
     claim: "An order exists in the Razorpay dashboard",
     status: "verified-by-human",
     evidence:
-      "order_TVI6K1KFNkmPxM · ₹1,001.01 · receipt bouncer_verify_mtezfd8u · 30 Aug 2026 · status created.",
+      "order_TVI6K1KFNkmPxM · ₹1,001.01 · receipt stealth_verify_mtezfd8u · 30 Aug 2026 · status created.",
   },
   {
     claim: "No payment is captured",

@@ -1,6 +1,7 @@
 import {
   decryptField,
   encryptField,
+  blobVersion,
   fieldAad,
   isEncrypted,
   readEncryptionKey,
@@ -29,7 +30,7 @@ import {
  *
  * The honest summary, and the one on /privacy: someone who steals this file
  * learns that a purchase happened, for how much, in what category, and what
- * Bouncer decided. They do not learn whose it was or what was in the basket.
+ * STEALTH decided. They do not learn whose it was or what was in the basket.
  *
  * HOW IT IS KEPT HONEST
  *
@@ -82,5 +83,12 @@ export function open(
         "`npm run db:reset` to rewrite it.",
     );
   }
-  return decryptField(stored, fieldAad(model, field, id), readEncryptionKey());
+  // The version prefix is inside the AAD, so a row written under an older
+  // scheme has to be authenticated under that scheme, not the current one.
+  const version = blobVersion(stored) ?? undefined;
+  return decryptField(
+    stored,
+    fieldAad(model, field, id, version),
+    readEncryptionKey(),
+  );
 }

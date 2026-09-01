@@ -52,7 +52,7 @@ export const COST_PER_MISSED_FRAUD_MINOR = 800_000; // INR 8,000 — chargeback 
 /* ----------------------------------------------------------------- runner */
 
 const AGENT_ID = "agt_eval";
-const KEY_REF = "kms://bouncer/agent-keys/eval";
+const KEY_REF = "kms://stealth/agent-keys/eval";
 const PRINCIPAL_ID = "prn_eval";
 
 type CaseResult = {
@@ -164,7 +164,7 @@ async function main(): Promise<void> {
   if (!stub && !isEngineConfigured()) {
     console.error(
       "No model backend configured, so there is nothing to measure.\n" +
-        "Set ANTHROPIC_API_KEY, or BOUNCER_ENGINE_PRESET + BOUNCER_ENGINE_API_KEY, then re-run.\n" +
+        "Set ANTHROPIC_API_KEY, or STEALTH_ENGINE_PRESET + STEALTH_ENGINE_API_KEY, then re-run.\n" +
         "Use --stub to check the harness plumbing without a model (produces no metrics).",
     );
     process.exitCode = 1;

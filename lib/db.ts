@@ -30,17 +30,17 @@ function createPrismaClient() {
   });
 }
 
-type BouncerPrismaClient = ReturnType<typeof createPrismaClient>;
+type STEALTHPrismaClient = ReturnType<typeof createPrismaClient>;
 
 // Next.js dev server hot-reloads modules; without a global singleton every
 // reload would open another SQLite handle.
 const globalForPrisma = globalThis as unknown as {
-  bouncerPrisma?: BouncerPrismaClient;
+  stealthPrisma?: STEALTHPrismaClient;
 };
 
-export const prisma: BouncerPrismaClient =
-  globalForPrisma.bouncerPrisma ?? createPrismaClient();
+export const prisma: STEALTHPrismaClient =
+  globalForPrisma.stealthPrisma ?? createPrismaClient();
 
 if (process.env.NODE_ENV !== "production") {
-  globalForPrisma.bouncerPrisma = prisma;
+  globalForPrisma.stealthPrisma = prisma;
 }

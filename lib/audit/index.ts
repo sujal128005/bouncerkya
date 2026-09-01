@@ -17,7 +17,7 @@ export * from "./chain";
 /**
  * Audit log — Prompt 4.
  *
- * Append-only, hash-chained record of everything Bouncer decided and everything
+ * Append-only, hash-chained record of everything STEALTH decided and everything
  * a human did about it. The chain is what makes "every money action
  * explainable" checkable rather than merely asserted.
  */

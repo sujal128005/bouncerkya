@@ -36,7 +36,7 @@ export function register(): void {
     );
     if (fatal.length > 0) {
       console.warn(
-        `[bouncer] configuration is invalid, and this build is continuing anyway.\n` +
+        `[stealth] configuration is invalid, and this build is continuing anyway.\n` +
           `These must be fixed before the server will start:\n${formatConfigProblems(fatal)}`,
       );
     }
